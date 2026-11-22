@@ -4,6 +4,7 @@ import { EmptyState } from "@/components/app/page-header";
 import { UploadZone } from "@/components/app/upload-zone";
 import { requireManager } from "@/server/auth/context";
 import { loadSite } from "../site-data";
+import { SiteExports } from "./site-exports";
 import { clientOptions } from "@/server/services/clients";
 import { listSiteDocuments } from "@/server/services/documents";
 import { siteOptions } from "@/server/services/sites";
@@ -19,6 +20,7 @@ export default async function SiteDocumentsPage({ params }: { params: Promise<{ 
   ]);
   return (
     <div className="grid gap-4">
+      <SiteExports siteId={id} />
       <UploadZone siteId={id} />
       {documents.length === 0 ? (
         <EmptyState

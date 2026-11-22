@@ -1,5 +1,6 @@
 /** Job registry: name → payload type → handler. */
 import { purgeExpiredRateLimits } from "@/server/security/rate-limit";
+import { generateHandover } from "@/server/services/handover";
 import { processDocument } from "@/server/services/document-pipeline";
 import { processMedia } from "@/server/services/media";
 import { generateDailySummary, runDailySummaries } from "@/server/services/summaries";
@@ -13,6 +14,7 @@ export type JobPayloads = {
   "summary.generate": { organizationId: string; siteId: string; dayKey: string };
   "summaries.tick": Record<string, never>;
   "maintenance.daily": Record<string, never>;
+  "handover.generate": { organizationId: string; siteId: string; userId: string; signatures: boolean };
 };
 
 export type JobName = keyof JobPayloads;
@@ -27,4 +29,5 @@ export const JOB_HANDLERS: { [N in JobName]: (payload: JobPayloads[N]) => Promis
     generateDailySummary(organizationId, siteId, dayKey),
   "summaries.tick": () => runDailySummaries(),
   "maintenance.daily": () => purgeExpiredRateLimits(),
+  "handover.generate": (p) => generateHandover(p),
 };

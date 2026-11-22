@@ -1,4 +1,4 @@
-import { HardHat, LayoutGrid, List, MapPin, Plus } from "lucide-react";
+import { Download, HardHat, LayoutGrid, List, MapPin, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/app/page-header";
@@ -51,11 +51,18 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
         title="Chantiers"
         description={`${sites.length} chantier${sites.length > 1 ? "s" : ""}`}
         actions={
-          <Button asChild>
-            <Link href="/app/chantiers/nouveau">
-              <Plus aria-hidden /> Nouveau chantier
-            </Link>
-          </Button>
+          <>
+            <Button asChild variant="outline">
+              <a href="/api/export/chantiers.csv">
+                <Download aria-hidden /> Exporter (CSV)
+              </a>
+            </Button>
+            <Button asChild>
+              <Link href="/app/chantiers/nouveau">
+                <Plus aria-hidden /> Nouveau chantier
+              </Link>
+            </Button>
+          </>
         }
       />
 

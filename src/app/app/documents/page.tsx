@@ -1,4 +1,4 @@
-import { FileText } from "lucide-react";
+import { Archive, Download, FileText, Mail } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { DocumentTable } from "@/components/app/document-table";
@@ -13,6 +13,7 @@ import { DOCUMENT_TYPES } from "@/lib/validation/business";
 import { requireManager } from "@/server/auth/context";
 import { clientOptions } from "@/server/services/clients";
 import { listDocuments } from "@/server/services/documents";
+import { inboundAddress } from "@/server/services/inbound-mail";
 import { siteOptions } from "@/server/services/sites";
 
 export const metadata: Metadata = { title: "Documents" };
@@ -39,18 +40,54 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
     clientOptions(ctx),
   ]);
   const filtered = Boolean(sp.q || type || sp.client || sp.chantier || sp.du || sp.au);
+  const exportQuery = new URLSearchParams(
+    Object.entries({ q: sp.q, type, client: sp.client, chantier: sp.chantier, du: sp.du, au: sp.au }).filter(
+      (e): e is [string, string] => Boolean(e[1]),
+    ),
+  ).toString();
+  const inbox = inboundAddress(ctx.organization.slug);
 
   return (
     <>
       <PageHeader
         title="Documents"
         description="Devis, factures, bons de commande, notes de frais, plans… Recherche dans le contenu des fichiers."
+        actions={
+          <>
+            <Button asChild variant="outline">
+              <a href={`/api/export/documents.csv${exportQuery ? `?${exportQuery}` : ""}`}>
+                <Download aria-hidden /> Exporter (CSV)
+              </a>
+            </Button>
+            <Button asChild variant="outline">
+              <a href={`/api/export/documents.zip${exportQuery ? `?${exportQuery}` : ""}`}>
+                <Archive aria-hidden /> Télécharger (ZIP)
+              </a>
+            </Button>
+          </>
+        }
       />
-      <Card className="mb-4">
-        <CardContent className="pt-6">
-          <UploadZone />
-        </CardContent>
-      </Card>
+      <div className="mb-4 grid gap-4 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardContent className="pt-6">
+            <UploadZone />
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="grid gap-2 pt-6 text-sm">
+            <p className="flex items-center gap-2 font-semibold">
+              <Mail className="size-4 text-orange-700" aria-hidden /> Transférez vos factures par e-mail
+            </p>
+            <p className="text-muted-foreground">
+              Chaque e-mail envoyé ou transféré à cette adresse est rangé automatiquement (type, fournisseur,
+              montant, chantier) :
+            </p>
+            <code className="rounded bg-stone-100 px-2 py-1 text-xs break-all" data-testid="inbound-address">
+              {inbox}
+            </code>
+          </CardContent>
+        </Card>
+      </div>
       <form
         className="mb-4 grid gap-2 rounded-xl border bg-white p-3 sm:grid-cols-2 lg:grid-cols-6"
         role="search"

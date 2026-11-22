@@ -131,3 +131,18 @@ Format : date — décision — raison.
   (résumés toutes les 15 min selon l'heure de chaque entreprise, maintenance quotidienne) quel que soit le mode.
 - **Simulateur WhatsApp** : construit un payload au format Meta, le signe avec `WHATSAPP_APP_SECRET` et l'envoie au
   vrai webhook ; les médias simulés sont stockés sous `dev/` et lus par l'adapter mock.
+
+## 2026-11-22 — Phase 5
+
+- **E-mail entrant** : le fournisseur d'e-mails (Postmark, Mailgun, Brevo… en mode « MIME brut ») poste le message
+  sur `/api/webhooks/inbound-mail` avec le secret `INBOUND_MAIL_SECRET`. L'organisation est retrouvée par
+  l'adresse `docs-<slug>@INBOUND_MAIL_DOMAIN` ; idempotence par Message-ID ; un e-mail sans pièce jointe est
+  conservé comme document texte.
+- **Recherche plein texte** : la ponctuation des références (`F-2026-990`, `16/11/2026`) est remplacée par des
+  espaces avant indexation (migration `fts_separators`), sinon PostgreSQL produit des nombres signés (« -2026 »).
+- **Dossier de fin de chantier** : généré en tâche de fond (pdfkit, polices standard), photos validées redimensionnées
+  par sharp, stocké comme document « généré » du chantier, notification à la personne qui l'a demandé.
+- **CSV** : séparateur « ; » + BOM UTF-8 (Excel français), protection contre l'injection de formules ; import lu dans
+  le navigateur (papaparse), 2 000 lignes maximum, doublons détectés par e-mail ou nom + téléphone.
+- **ZIP** : construits en flux (archiver) sans charger les fichiers en mémoire ; export chantier = documents
+  originaux, photos par étape, `etapes.csv`, `photos.csv`, `journal.txt`.

@@ -52,11 +52,11 @@ Légende : `[x]` fait · `[ ]` à faire
 
 ## Phase 5 — Paperasse automatique
 
-- [ ] E-mail entrant + simulateur
-- [ ] OCR + classement automatique
-- [ ] PDF de fin de chantier
-- [ ] Import / export CSV, ZIP
-- [ ] E2E n°4
+- [x] E-mail entrant `docs-<slug>@…` (webhook MIME brut + secret, idempotence Message-ID) + simulateur `/dev/inbound-mail`
+- [x] OCR + classement automatique (pipeline commun upload / e-mail / WhatsApp, « À traiter » si confiance faible)
+- [x] Dossier de fin de chantier (PDF : garde, étapes, photos horodatées par étape, documents, signatures, mention)
+- [x] Import clients CSV (mapping guidé, doublons, erreurs par ligne), exports CSV (clients, chantiers, documents), ZIP chantier et ZIP documents
+- [x] E2E n°4 + tests d'intégration (e-mail entrant, dossier PDF, import / export)
 
 ## Phase 6 — Hors-ligne et terrain
 

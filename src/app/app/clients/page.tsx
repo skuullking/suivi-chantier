@@ -1,4 +1,4 @@
-import { Archive, Plus, UsersRound } from "lucide-react";
+import { Archive, Download, Plus, Upload, UsersRound } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/app/page-header";
@@ -30,11 +30,23 @@ export default async function ClientsPage({
         title="Clients"
         description={`${clients.length} client${clients.length > 1 ? "s" : ""}${archived ? " archivé(s)" : ""}`}
         actions={
-          <Button asChild>
-            <Link href="/app/clients/nouveau">
-              <Plus aria-hidden /> Nouveau client
-            </Link>
-          </Button>
+          <>
+            <Button asChild variant="outline">
+              <a href="/api/export/clients.csv">
+                <Download aria-hidden /> Exporter (CSV)
+              </a>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/app/clients/import">
+                <Upload aria-hidden /> Importer (CSV)
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link href="/app/clients/nouveau">
+                <Plus aria-hidden /> Nouveau client
+              </Link>
+            </Button>
+          </>
         }
       />
       <form className="mb-4 flex flex-wrap items-center gap-2" role="search">

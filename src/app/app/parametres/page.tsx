@@ -4,6 +4,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/app/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requireOwner } from "@/server/auth/context";
+import { inboundAddress } from "@/server/services/inbound-mail";
 import { getOrganization } from "@/server/services/settings";
 import { OrganizationForm, ValidationSettingsForm } from "./settings-forms";
 
@@ -80,6 +81,39 @@ export default async function SettingsPage() {
               <ChevronRight className="size-4 text-stone-400" aria-hidden />
             </Link>
           ))}
+          <Card>
+            <CardHeader>
+              <CardTitle>E-mail des documents</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-2 text-sm">
+              <p className="text-muted-foreground">
+                Transférez factures, devis et bons de commande à cette adresse : ils sont classés
+                automatiquement.
+              </p>
+              <code className="rounded bg-stone-100 px-2 py-1 text-xs break-all">
+                {inboundAddress(org.slug)}
+              </code>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Exports</CardTitle>
+            </CardHeader>
+            <CardContent className="grid gap-1 text-sm">
+              <a className="text-orange-700 hover:underline" href="/api/export/clients.csv">
+                Clients (CSV)
+              </a>
+              <a className="text-orange-700 hover:underline" href="/api/export/chantiers.csv">
+                Chantiers (CSV)
+              </a>
+              <a className="text-orange-700 hover:underline" href="/api/export/documents.csv">
+                Documents (CSV)
+              </a>
+              <a className="text-orange-700 hover:underline" href="/api/export/documents.zip">
+                Tous les documents (ZIP)
+              </a>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </>

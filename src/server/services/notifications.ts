@@ -11,7 +11,8 @@ export type NotificationType =
   | "site.completed"
   | "step.completed"
   | "assignment.created"
-  | "reminder.tomorrow";
+  | "reminder.tomorrow"
+  | "document.ready";
 
 export type NotificationInput = {
   organizationId: string;
