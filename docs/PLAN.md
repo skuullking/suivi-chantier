@@ -37,6 +37,7 @@ tests/unit, tests/integration, e2e/
 ## Phases
 
 ### Phase 1 — Fondations
+
 - Next.js + TypeScript strict, Tailwind v4, shadcn/ui, lucide.
 - ESLint, Prettier, Husky + lint-staged, Vitest, Playwright, CI GitHub Actions.
 - `docker-compose.dev.yml` : Postgres 17, MinIO, Mailpit.
@@ -48,6 +49,7 @@ tests/unit, tests/integration, e2e/
 - **Critère** : je peux m'inscrire, inviter un utilisateur, et les permissions sont testées.
 
 ### Phase 2 — Cœur métier
+
 - Clients (CRUD, fiche, tags, notes, archivage).
 - Chantiers : liste (cartes / tableau, filtres, recherche), assistant de création en 3 étapes, fiche à onglets.
 - Modèles d'étapes (éditeur), étapes (glisser-déposer, statut, poids, visibilité client), progression pondérée, retard.
@@ -58,28 +60,33 @@ tests/unit, tests/integration, e2e/
 - **Critère** : je gère un chantier complet côté patron (E2E n°1).
 
 ### Phase 3 — Ouvrier + Client
+
 - Espace `/w` : Aujourd'hui, détail chantier, photo plein écran, vocal, Moi ; gros boutons.
 - Traitement des médias (EXIF, GPS, miniatures), validation des photos (lot, clavier, recadrage, floutage manuel).
 - Portail client `/s/[token]` : jeton haché, révocable, rate-limité, noindex ; onglet « Espace client ».
 - **Critère** : parcours photo → validation → vue client (E2E n°2, n°5, n°6).
 
 ### Phase 4 — IA et WhatsApp
+
 - Adapters messagerie / transcription / LLM (mock + réel), webhook WhatsApp signé et idempotent.
 - Rattachement automatique avec score de confiance, boîte « À traiter », commandes texte.
 - Transcription des vocaux, résumé du jour (brouillon → approbation → envoi), simulateur `/dev/whatsapp`.
 - **Critère** : E2E n°3.
 
 ### Phase 5 — Paperasse automatique et dossier de fin de chantier
+
 - E-mail entrant (`docs-<slug>@…`), simulateur `/dev/inbound-mail`, pipeline OCR → classement → « À traiter ».
 - PDF de fin de chantier, import CSV clients, exports CSV et ZIP.
 - **Critère** : E2E n°4.
 
 ### Phase 6 — Hors-ligne et finitions terrain
+
 - Service worker, cache de la journée, file IndexedDB, synchronisation automatique, état visible.
 - Notifications e-mail + push web, rappels de la veille, boutons Maps / Waze, polissage UX.
 - **Critère** : couper le réseau, envoyer 3 photos, rétablir : tout est synchronisé (E2E hors-ligne).
 
 ### Phase 7 — Monétisation, RGPD, déploiement
+
 - Plans + limites, `BillingProvider` (mock / Stripe), onboarding finalisé, pages légales.
 - Export / suppression RGPD, rétention, sauvegardes, Dockerfile prod, Caddy, README Proxmox, durcissement.
 - **Critère** : `docker compose up` en prod-like fonctionne de bout en bout.

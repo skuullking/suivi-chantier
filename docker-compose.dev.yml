@@ -1,0 +1,53 @@
+# Services de développement (optionnel) : PostgreSQL, MinIO, Mailpit.
+# Alternative sans Docker : `pnpm db:local` (PostgreSQL embarqué) + STORAGE_DRIVER=local + MAIL_DRIVER=dev.
+#
+#   docker compose -f docker-compose.dev.yml up -d
+#
+# Puis dans .env : STORAGE_DRIVER=s3, MAIL_DRIVER=smtp (Mailpit : http://localhost:8025, MinIO : http://localhost:9001)
+name: chantierlink-dev
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: chantierlink
+      POSTGRES_PASSWORD: chantierlink
+      POSTGRES_DB: chantierlink
+    ports:
+      # 5433 côté machine pour ne pas entrer en conflit avec un PostgreSQL déjà installé.
+      - "5433:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+      - ./docker/postgres/init-test-dbs.sql:/docker-entrypoint-initdb.d/10-test-dbs.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U chantierlink -d chantierlink"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: chantierlink
+      MINIO_ROOT_PASSWORD: chantierlink-secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+volumes:
+  pg-data:
+  minio-data:

@@ -36,6 +36,7 @@ Tu es un développeur full-stack senior. Tu construis **de bout en bout** l'appl
 **Cible** : TPE d'artisans (1 à 10 personnes). Utilisateurs peu techniques, souvent sur téléphone, parfois avec des gants, parfois sans réseau.
 
 **Hors périmètre (NE PAS FAIRE)** :
+
 - Générer des devis ou des factures, faire de la compta.
 - Promettre un « archivage à valeur légale / probante ». Formule autorisée : « tous vos documents chantier au même endroit, conservés et retrouvables ».
 - Planning façon Gantt complexe.
@@ -59,16 +60,16 @@ Tu es un développeur full-stack senior. Tu construis **de bout en bout** l'appl
 
 ### Adapters (interfaces + mocks + vraies implémentations)
 
-| Domaine | Interface | Mock (dev/test) | Réel (via env) |
-|---|---|---|---|
-| Messagerie | `MessagingProvider` | Simulateur WhatsApp local (page `/dev/whatsapp`) | WhatsApp Business Cloud API (Meta) |
-| Transcription | `TranscriptionProvider` | Texte fictif | Whisper (API ou whisper.cpp) |
-| LLM (résumés, classement) | `LlmProvider` | Réponses déterministes | API Anthropic (Claude) |
-| OCR documents | `OcrProvider` | Texte fictif | Tesseract ou API OCR |
-| E-mail sortant | `MailProvider` | Console / MailHog | SMTP |
-| E-mail entrant | `InboundMailProvider` | Dépôt via page `/dev/inbound-mail` | Webhook ou IMAP |
-| Paiement | `BillingProvider` | Faux plans | Stripe (feature flag) |
-| Stockage | `StorageProvider` | MinIO local | S3 UE |
+| Domaine                   | Interface               | Mock (dev/test)                                  | Réel (via env)                     |
+| ------------------------- | ----------------------- | ------------------------------------------------ | ---------------------------------- |
+| Messagerie                | `MessagingProvider`     | Simulateur WhatsApp local (page `/dev/whatsapp`) | WhatsApp Business Cloud API (Meta) |
+| Transcription             | `TranscriptionProvider` | Texte fictif                                     | Whisper (API ou whisper.cpp)       |
+| LLM (résumés, classement) | `LlmProvider`           | Réponses déterministes                           | API Anthropic (Claude)             |
+| OCR documents             | `OcrProvider`           | Texte fictif                                     | Tesseract ou API OCR               |
+| E-mail sortant            | `MailProvider`          | Console / MailHog                                | SMTP                               |
+| E-mail entrant            | `InboundMailProvider`   | Dépôt via page `/dev/inbound-mail`               | Webhook ou IMAP                    |
+| Paiement                  | `BillingProvider`       | Faux plans                                       | Stripe (feature flag)              |
+| Stockage                  | `StorageProvider`       | MinIO local                                      | S3 UE                              |
 
 ---
 
@@ -102,18 +103,18 @@ Index sur : organizationId, siteId, clientId, dates, statuts. Recherche plein te
 
 ## 4. RÔLES ET PERMISSIONS
 
-| Action | OWNER | OFFICE | WORKER | CLIENT (lien) |
-|---|---|---|---|---|
-| Paramètres entreprise, abonnement, membres | ✅ | ❌ | ❌ | ❌ |
-| Clients : créer / modifier / voir | ✅ | ✅ | lecture limitée (nom, adresse du chantier) | ❌ |
-| Chantiers : créer / modifier | ✅ | ✅ | ❌ | ❌ |
-| Chantiers : voir | tous | tous | **seulement les siens** (assignés) | **le sien** |
-| Documents : ajouter / voir | ✅ | ✅ | ajouter notes de frais / bons ; voir plans et consignes | seulement ceux marqués visibles |
-| Planning : modifier | ✅ | ✅ | ❌ (voit le sien) | ❌ (voit les prochaines interventions) |
-| Photos : envoyer | ✅ | ✅ | ✅ | ❌ |
-| Photos : valider / refuser | ✅ | ✅ (selon réglage) | ❌ | ❌ |
-| Résumé du jour : approuver / envoyer | ✅ | ✅ | ❌ | ❌ |
-| Journal d'audit | ✅ | ❌ | ❌ | ❌ |
+| Action                                     | OWNER | OFFICE             | WORKER                                                  | CLIENT (lien)                          |
+| ------------------------------------------ | ----- | ------------------ | ------------------------------------------------------- | -------------------------------------- |
+| Paramètres entreprise, abonnement, membres | ✅    | ❌                 | ❌                                                      | ❌                                     |
+| Clients : créer / modifier / voir          | ✅    | ✅                 | lecture limitée (nom, adresse du chantier)              | ❌                                     |
+| Chantiers : créer / modifier               | ✅    | ✅                 | ❌                                                      | ❌                                     |
+| Chantiers : voir                           | tous  | tous               | **seulement les siens** (assignés)                      | **le sien**                            |
+| Documents : ajouter / voir                 | ✅    | ✅                 | ajouter notes de frais / bons ; voir plans et consignes | seulement ceux marqués visibles        |
+| Planning : modifier                        | ✅    | ✅                 | ❌ (voit le sien)                                       | ❌ (voit les prochaines interventions) |
+| Photos : envoyer                           | ✅    | ✅                 | ✅                                                      | ❌                                     |
+| Photos : valider / refuser                 | ✅    | ✅ (selon réglage) | ❌                                                      | ❌                                     |
+| Résumé du jour : approuver / envoyer       | ✅    | ✅                 | ❌                                                      | ❌                                     |
+| Journal d'audit                            | ✅    | ❌                 | ❌                                                      | ❌                                     |
 
 Implémentation : un module central `can(user, action, resource)` utilisé **côté serveur** dans chaque route / action serveur. Tests unitaires de la matrice complète.
 
@@ -122,11 +123,13 @@ Implémentation : un module central `can(user, action, resource)` utilisé **cô
 ## 5. NAVIGATION ET ÉCRANS
 
 ### 5.1 Public
+
 - `/` page de présentation courte + CTA
 - `/connexion`, `/inscription` (crée l'organisation + OWNER), `/mot-de-passe-oublie`
 - `/invitation/[token]` : accepter une invitation, définir son mot de passe
 
 ### 5.2 Espace patron / bureau (desktop d'abord, responsive) : préfixe `/app`
+
 Barre latérale : **Tableau de bord · Chantiers · Clients · Planning · À traiter · Documents · Équipe · Paramètres**.
 
 - `/app` **Tableau de bord** : chantiers en cours (cartes avec barre de progression), alertes (retards, photos à valider, éléments à classer, résumés à approuver), activité récente, raccourcis « Nouveau chantier / Nouveau client ».
@@ -148,7 +151,9 @@ Barre latérale : **Tableau de bord · Chantiers · Clients · Planning · À tr
 - `/app/parametres` : entreprise, modèles d'étapes (éditeur), WhatsApp, e-mail d'envoi des documents, réglages de validation (photos auto-approuvées ou non, résumé auto-envoyé ou non), abonnement, export des données (CSV/ZIP), suppression de compte.
 
 ### 5.3 Espace ouvrier (mobile d'abord, PWA) : préfixe `/w`
+
 Barre du bas à 4 onglets : **Aujourd'hui · Photo · Vocal · Moi**.
+
 - `/w` **Aujourd'hui** : mes chantiers du jour, pour chacun adresse + bouton **Y aller** (Maps/Waze), consignes, tâches à cocher, boutons XXL : **J'arrive**, **Photo**, **Vocal**, **Étape terminée**.
 - `/w/chantier/[id]` : détail (étapes, plans, consignes, historique de mes envois).
 - `/w/photo` : appareil photo plein écran, un tap = envoi automatique au chantier actif et à l'étape en cours (modifiable en un tap), légende optionnelle.
@@ -157,6 +162,7 @@ Barre du bas à 4 onglets : **Aujourd'hui · Photo · Vocal · Moi**.
 - Contraintes UX : cibles tactiles ≥ 56 px, forts contrastes, peu de texte, retours visuels clairs (✔ envoyé, ⏳ en attente de réseau).
 
 ### 5.4 Portail client : `/s/[token]`
+
 - En-tête : nom de l'entreprise, titre du chantier, adresse (sans données sensibles inutiles).
 - **Barre de progression** globale + liste des étapes (faites / en cours / à venir).
 - **Fil d'actualité** : résumés du jour approuvés et photos validées, en ordre chronologique inverse.
@@ -166,6 +172,7 @@ Barre du bas à 4 onglets : **Aujourd'hui · Photo · Vocal · Moi**.
 - Aucun compte, aucun mot de passe. Jeton long et aléatoire (≥ 32 octets), **stocké haché**, révocable, avec limitation de débit. Page `noindex`. Mobile d'abord.
 
 ### 5.5 Dev uniquement (désactivées en production)
+
 - `/dev/whatsapp` : simulateur de conversation WhatsApp (envoyer photo / vocal / texte comme un ouvrier).
 - `/dev/inbound-mail` : simuler un e-mail entrant avec pièce jointe.
 
@@ -174,12 +181,15 @@ Barre du bas à 4 onglets : **Aujourd'hui · Photo · Vocal · Moi**.
 ## 6. FONCTIONNALITÉS DÉTAILLÉES
 
 ### 6.1 Socle
+
 Auth + organisations + rôles + invitations ; CRUD clients ; CRUD chantiers ; étapes ; documents ; planning ; tâches du jour ; recherche globale (Ctrl/Cmd+K) ; notifications in-app ; journal d'audit.
 
 ### 6.2 Progression
+
 Progression d'un chantier = somme pondérée des étapes terminées (poids par défaut égal, modifiable). Mise à jour automatique à chaque changement d'étape. Statut « en retard » si la date prévue d'une étape est dépassée.
 
 ### 6.3 Entrée WhatsApp (le cœur du produit)
+
 1. Un numéro WhatsApp Business unique reçoit les messages (webhook `/api/webhooks/whatsapp`, vérification de signature, idempotence par `message_id`).
 2. L'expéditeur est identifié via `WhatsAppContact` (numéro → ouvrier). Inconnu → réponse polie et message ignoré.
 3. **Rattachement au chantier** : (a) chantier du jour de l'ouvrier si un seul ; (b) sinon celui indiqué dans le message (nom ou code court) ; (c) sinon l'IA propose selon contexte (planning, GPS de l'image, texte) avec un **score de confiance**.
@@ -188,6 +198,7 @@ Progression d'un chantier = somme pondérée des étapes terminées (poids par d
 6. Commandes simples par texte : `J'arrive`, `Terminé`, `Étape terminée`, `Problème : …` (le problème notifie le patron et n'est **jamais** visible du client).
 
 ### 6.4 Modèles d'étapes pré-remplis (seed, éditables)
+
 - **Charpentier** : Prise de côtes → Plans / commande des bois → Taille en atelier → Livraison → Pose charpente → Couverture → Finitions → Nettoyage et réception.
 - **Menuisier** : Relevé de mesures → Validation des plans → Fabrication → Livraison → Pose → Finitions → Réception.
 - **Pisciniste** : Terrassement → Coque / structure → Plomberie et électricité → Finitions → Mise en eau → Réception.
@@ -195,38 +206,47 @@ Progression d'un chantier = somme pondérée des étapes terminées (poids par d
 - **Paysagiste** : Relevé → Terrassement → Réseaux d'arrosage → Plantations → Finitions → Réception.
 
 ### 6.5 Résumé du jour par IA
+
 - Tâche planifiée en fin de journée (heure réglable) : pour chaque chantier actif ce jour-là, le `LlmProvider` rédige un court résumé client (2 à 4 phrases, ton chaleureux et professionnel, **sans jargon et sans détails internes**) à partir des photos du jour, transcriptions, étapes terminées, prochaines étapes.
 - Statut `DRAFT` → notification au patron → **approbation en 1 clic** (éditable) → envoi au client (e-mail et / ou SMS / WhatsApp avec le lien magique) et publication dans le fil du portail.
 - Réglage : mode « toujours valider » (défaut) ou « envoi automatique ».
 - Les problèmes internes (`Problème : …`) ne sont **jamais** inclus.
 
 ### 6.6 Validation des photos
+
 File de validation avec grille, approbation / refus en lot, raccourcis clavier, recadrage simple, floutage de visages ou plaques en option (si faisable, sinon note dans DECISIONS.md). Seules les photos `APPROVED` apparaissent côté client.
 
 ### 6.7 Classement automatique des papiers
+
 - Adresse e-mail dédiée par organisation (`docs-<slug>@…`) : on y transfère un mail ou une photo de facture.
 - Pipeline : réception → stockage → OCR → l'IA détecte **type** (devis / facture / bon de commande / note de frais), **fournisseur ou client**, **date**, **montant**, et propose le **chantier et le client**. Confiance haute → classé ; sinon → « À traiter ».
 - Téléversement manuel (glisser-déposer, plusieurs fichiers) passe par le même pipeline.
 - Toujours conserver le fichier original, immuable.
 
 ### 6.8 Dossier de fin de chantier (PDF)
+
 Bouton « Générer le dossier de fin de chantier » : PDF propre avec page de garde (entreprise, client, adresse, dates), liste des étapes avec dates, photos validées horodatées par étape, liste des documents, signatures optionnelles. Stocké dans les documents du chantier. Mention de bas de page : « Document récapitulatif généré par ChantierLink » (sans prétention de valeur légale).
 
 ### 6.9 Mode hors-ligne (ouvrier)
+
 - Cache de la journée (chantiers, tâches, consignes) à l'ouverture.
 - Photos / vocaux / actions enregistrés en local (IndexedDB) et **synchronisés automatiquement** au retour du réseau, avec file d'attente visible et reprise sur erreur.
 - Horodatage de capture conservé ; l'horodatage serveur fait foi pour la fiabilité.
 
 ### 6.10 Notifications
+
 In-app + e-mail (+ push web si possible) : photos à valider, élément à classer, résumé prêt, problème signalé, chantier démarré / terminé, rappel de la veille pour les ouvriers (« Demain : chantier Dupont, 8 h »).
 
 ### 6.11 Import / export / cohabitation
+
 Import clients en CSV (mapping de colonnes guidé), export CSV (clients, chantiers, documents), export ZIP complet d'un chantier (documents + photos + dossier PDF), export complet de l'organisation (RGPD).
 
 ### 6.12 Onboarding (10 minutes)
+
 Après l'inscription : choisir le métier → modèle d'étapes chargé → inviter un ouvrier → créer un premier chantier avec un client fictif ou réel → afficher le lien client de démonstration. Barre de progression d'onboarding sur le tableau de bord.
 
 ### 6.13 Abonnement (derrière un feature flag)
+
 Plans : **Solo 29 €/mois**, **Équipe 59 €/mois (jusqu'à 5 employés)**, **Pro 99 €/mois (au-delà)**, essai gratuit de 14 jours. `BillingProvider` + page abonnement + limites de plan (nombre de membres, stockage) appliquées côté serveur. Stripe réel branchable par variables d'env ; sinon mock.
 
 ---
@@ -261,19 +281,19 @@ Plans : **Solo 29 €/mois**, **Équipe 59 €/mois (jusqu'à 5 employés)**, **
 
 ## 9. PHASES ET CRITÈRES D'ACCEPTATION
 
-**Phase 1 : Fondations.** Repo, stack, CI, Docker compose, Prisma, auth, multi-tenant, rôles + module `can`, layout `/app`, seed. *Critère : je peux m'inscrire, inviter un utilisateur, et les permissions sont testées.*
+**Phase 1 : Fondations.** Repo, stack, CI, Docker compose, Prisma, auth, multi-tenant, rôles + module `can`, layout `/app`, seed. _Critère : je peux m'inscrire, inviter un utilisateur, et les permissions sont testées._
 
-**Phase 2 : Cœur métier.** Clients, chantiers, modèles d'étapes, étapes, progression, documents (upload, type, recherche, aperçu), planning + tâches, tableau de bord, recherche globale. *Critère : je gère un chantier complet côté patron.*
+**Phase 2 : Cœur métier.** Clients, chantiers, modèles d'étapes, étapes, progression, documents (upload, type, recherche, aperçu), planning + tâches, tableau de bord, recherche globale. _Critère : je gère un chantier complet côté patron._
 
-**Phase 3 : Ouvrier + Client.** Espace `/w` mobile PWA (journée, photo rapide, vocal, étape terminée), validation des photos, portail client `/s/[token]` avec lien magique. *Critère : parcours photo → validation → vue client OK.*
+**Phase 3 : Ouvrier + Client.** Espace `/w` mobile PWA (journée, photo rapide, vocal, étape terminée), validation des photos, portail client `/s/[token]` avec lien magique. _Critère : parcours photo → validation → vue client OK._
 
-**Phase 4 : IA et WhatsApp.** Adapters + mocks + simulateur, webhook WhatsApp, rattachement automatique + confiance + « À traiter », transcription, résumé du jour + approbation + envoi. *Critère : parcours E2E n°3 vert.*
+**Phase 4 : IA et WhatsApp.** Adapters + mocks + simulateur, webhook WhatsApp, rattachement automatique + confiance + « À traiter », transcription, résumé du jour + approbation + envoi. _Critère : parcours E2E n°3 vert._
 
-**Phase 5 : Paperasse automatique et dossier de fin de chantier.** E-mail entrant, OCR, classement auto, PDF de fin de chantier, import / export CSV et ZIP. *Critère : parcours E2E n°4 vert.*
+**Phase 5 : Paperasse automatique et dossier de fin de chantier.** E-mail entrant, OCR, classement auto, PDF de fin de chantier, import / export CSV et ZIP. _Critère : parcours E2E n°4 vert._
 
-**Phase 6 : Hors-ligne et finitions terrain.** File IndexedDB, synchro, notifications, rappels de la veille, boutons Waze / Maps, polissage UX. *Critère : couper le réseau, envoyer 3 photos, rétablir : tout est synchronisé.*
+**Phase 6 : Hors-ligne et finitions terrain.** File IndexedDB, synchro, notifications, rappels de la veille, boutons Waze / Maps, polissage UX. _Critère : couper le réseau, envoyer 3 photos, rétablir : tout est synchronisé._
 
-**Phase 7 : Monétisation, RGPD, déploiement.** Plans + limites, `BillingProvider`, onboarding finalisé, pages légales, export / suppression RGPD, sauvegardes, Dockerfile prod, Caddy, README de déploiement Proxmox, durcissement sécurité. *Critère : `docker compose up` en prod-like fonctionne de bout en bout.*
+**Phase 7 : Monétisation, RGPD, déploiement.** Plans + limites, `BillingProvider`, onboarding finalisé, pages légales, export / suppression RGPD, sauvegardes, Dockerfile prod, Caddy, README de déploiement Proxmox, durcissement sécurité. _Critère : `docker compose up` en prod-like fonctionne de bout en bout._
 
 ---
 

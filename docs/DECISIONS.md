@@ -46,3 +46,25 @@ Format : date — décision — raison.
   soucis de binaires natifs (argon2, sharp, Prisma).
 - **Pages `/dev/*`** actives hors production, ou si `ENABLE_DEV_TOOLS=true` (activé dans le compose de démonstration
   pour tout essayer sans clé ; à désactiver en vraie production).
+
+## 2026-11-22 — Phase 1
+
+- **Mode local sans Docker** (demande de l'utilisateur) : `pnpm db:local` lance un vrai PostgreSQL embarqué
+  (`embedded-postgres`, binaires distribués via npm, données dans `.local/pgdata`). Fichiers sur disque
+  (`STORAGE_DRIVER=local`), e-mails consultables sur `/dev/mails` (`MAIL_DRIVER=dev`). Docker reste supporté.
+- **Port PostgreSQL 5433** (local embarqué, docker-compose de dev et CI) : un PostgreSQL 17 est déjà installé en
+  service Windows sur 5432 sur la machine de développement ; on ne le touche pas.
+- **Prisma 7.10.1 épinglé** : le tag npm `latest` de `prisma` pointe vers une 8.0.0-rc ; on reste sur la dernière
+  version stable, alignée avec `@prisma/client`.
+- **Recherche plein texte : configuration `simple` + `unaccent`** (plutôt que `french`) pour que la recherche par préfixe
+  fonctionne pendant la frappe ; colonnes `tsvector` maintenues par triggers SQL, index GIN déclarés dans le schéma
+  Prisma (aucune dérive détectée par `prisma migrate diff`).
+- **`cacheComponents` désactivé** (activé par défaut dans le gabarit Next 16.4) : toutes les pages sont rendues
+  dynamiquement, ce qu'impose de toute façon la CSP à nonce.
+- **CSP** : `style-src 'unsafe-inline'` conservé car Radix UI positionne ses menus via des attributs `style` ;
+  les scripts restent protégés par nonce + `strict-dynamic`.
+- **Polices système** au lieu de `next/font/google` : pas de téléchargement au build (build hors-ligne possible) et
+  aucune requête vers Google (RGPD).
+- **Limitation de débit** : multiplicateur `RATE_LIMIT_MULTIPLIER` (1 par défaut) pour les tests E2E.
+- **shadcn/ui (style radix-nova)** : il utilise le paquet `cn` (dépôt officiel shadcn-ui) ; `CardTitle` rend un vrai
+  titre (`h2` par défaut, `h1` sur les pages d'authentification) pour l'accessibilité.
