@@ -3,6 +3,7 @@ import Link from "next/link";
 import { PlanningBoard } from "@/components/app/planning-board";
 import { Button } from "@/components/ui/button";
 import { requireManager } from "@/server/auth/context";
+import { loadSite } from "../site-data";
 import { buildBoard } from "../../../planning/board-data";
 
 export default async function SitePlanningPage({
@@ -14,6 +15,7 @@ export default async function SitePlanningPage({
 }) {
   const ctx = await requireManager();
   const { id } = await params;
+  await loadSite(ctx, id);
   const sp = await searchParams;
   const board = await buildBoard(ctx, { vue: "semaine", date: sp.date }, id);
   const href = (date: string) => `/app/chantiers/${id}/planning?date=${date}`;

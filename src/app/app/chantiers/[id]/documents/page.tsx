@@ -3,6 +3,7 @@ import { DocumentTable } from "@/components/app/document-table";
 import { EmptyState } from "@/components/app/page-header";
 import { UploadZone } from "@/components/app/upload-zone";
 import { requireManager } from "@/server/auth/context";
+import { loadSite } from "../site-data";
 import { clientOptions } from "@/server/services/clients";
 import { listSiteDocuments } from "@/server/services/documents";
 import { siteOptions } from "@/server/services/sites";
@@ -10,6 +11,7 @@ import { siteOptions } from "@/server/services/sites";
 export default async function SiteDocumentsPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await requireManager();
   const { id } = await params;
+  await loadSite(ctx, id);
   const [documents, sites, clients] = await Promise.all([
     listSiteDocuments(ctx, id),
     siteOptions(ctx, true),

@@ -15,6 +15,8 @@ const envSchema = z.object({
     .default("postgresql://chantierlink:chantierlink@localhost:5433/chantierlink"),
   LOG_LEVEL: z.enum(["fatal", "error", "warn", "info", "debug", "trace", "silent"]).default("info"),
   ENABLE_DEV_TOOLS: bool,
+  JOBS_MODE: z.enum(["inline", "queue"]).default("inline"),
+  WORKER_POLL_INTERVAL_SECONDS: z.coerce.number().min(0.5).default(2),
 
   STORAGE_DRIVER: z.enum(["local", "s3"]).default("local"),
   STORAGE_LOCAL_DIR: z.string().default(".local/storage"),

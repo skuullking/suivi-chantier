@@ -273,6 +273,7 @@ function DropCell({
       ref={setNodeRef}
       data-testid="planning-cell"
       data-cell={id}
+      data-today={highlight ? "true" : undefined}
       className={cn(
         "group border-b border-l p-1 align-top",
         tall ? "h-28" : "h-20",

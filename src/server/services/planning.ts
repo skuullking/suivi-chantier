@@ -104,6 +104,9 @@ export async function createAssignment(ctx: ServiceContext, input: AssignmentInp
       include: assignmentInclude,
     });
     await ensureSiteMember(ctx.organizationId, site.id, input.userId, tx);
+    // Planning someone on a draft site means it is scheduled.
+    if (site.status === "DRAFT")
+      await tx.site.update({ where: { id: site.id }, data: { status: "PLANNED" } });
     await recordSiteEvent(
       {
         organizationId: ctx.organizationId,

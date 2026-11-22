@@ -153,3 +153,9 @@ export async function deleteStep(ctx: ServiceContext, stepId: string) {
     );
   });
 }
+
+export async function setStepVisibility(ctx: ServiceContext, stepId: string, visible: boolean) {
+  const step = await loadStep(ctx, stepId);
+  await loadSiteFor(ctx, step.siteId, "step.update");
+  return db.siteStep.update({ where: { id: stepId }, data: { visibleToClient: visible } });
+}

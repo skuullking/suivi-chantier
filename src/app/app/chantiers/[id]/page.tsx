@@ -10,7 +10,7 @@ import { SLOT_LABELS } from "@/lib/labels";
 import { requireManager } from "@/server/auth/context";
 import { nextStep } from "@/server/domain/progress";
 import { listAssignments, planningMembers } from "@/server/services/planning";
-import { getSite } from "@/server/services/sites";
+import { loadSite } from "./site-data";
 import { listSiteTasks } from "@/server/services/tasks";
 import { DeleteSiteButton, EditSiteDialog, TeamDialog } from "./summary-dialogs";
 import { TaskList } from "./task-list";
@@ -18,7 +18,7 @@ import { TaskList } from "./task-list";
 export default async function SiteSummaryPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await requireManager();
   const { id } = await params;
-  const site = await getSite(ctx, id);
+  const site = await loadSite(ctx, id);
   const day = today(ctx.organizationTimeZone);
   const [tasks, members, upcoming] = await Promise.all([
     listSiteTasks(ctx, id),

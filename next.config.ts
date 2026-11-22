@@ -14,6 +14,7 @@ const nextConfig: NextConfig = {
   serverExternalPackages: [
     "@node-rs/argon2",
     "sharp",
+    "exifr",
     "pdfkit",
     "archiver",
     "pg-boss",

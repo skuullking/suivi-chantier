@@ -34,10 +34,11 @@ Légende : `[x]` fait · `[ ]` à faire
 
 ## Phase 3 — Ouvrier + Client
 
-- [ ] Espace ouvrier `/w`
-- [ ] Traitement médias + validation photos
-- [ ] Portail client `/s/[token]` + onglet Espace client
-- [ ] E2E n°2, n°5, n°6
+- [x] Espace ouvrier `/w` : Aujourd'hui (Y aller Maps/Waze, consignes, tâches, J'arrive, Photo, Vocal, Étape terminée), photo plein écran (getUserMedia + repli), vocal (MediaRecorder), Moi
+- [x] Traitement des médias (EXIF date/GPS, version d'affichage sans métadonnées, miniature) en tâche de fond
+- [x] Validation des photos (grille, lot, raccourcis clavier, recadrage, floutage manuel), onglet Photos & médias
+- [x] Portail client `/s/[token]` (jeton haché + chiffré, révocable, expirable, limité, noindex) + onglet Espace client
+- [x] E2E n°2, n°5, n°6 + tests d'intégration (IDOR médias / portail)
 
 ## Phase 4 — IA et WhatsApp
 

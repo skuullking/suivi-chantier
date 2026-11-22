@@ -2,6 +2,7 @@ import { AlertTriangle, History, Lock, MessageSquareText, Mic, Sparkles } from "
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatDateTime, formatDayLong } from "@/lib/format";
 import { requireManager } from "@/server/auth/context";
+import { loadSite } from "../site-data";
 import { describeEvent } from "@/server/services/events";
 import { siteJournal } from "@/server/services/notes";
 import { NoteForm } from "./note-form";
@@ -15,6 +16,7 @@ const SUMMARY_LABELS = {
 export default async function SiteJournalPage({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await requireManager();
   const { id } = await params;
+  await loadSite(ctx, id);
   const { notes, summaries, events } = await siteJournal(ctx, id);
 
   return (

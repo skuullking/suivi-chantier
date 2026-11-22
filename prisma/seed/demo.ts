@@ -3,8 +3,9 @@ import type { DocumentType, MediaSource, StepStatus, ValidationStatus } from "@/
 import { addDays, startOfWeek, today } from "@/lib/dates";
 import { storage } from "@/server/adapters/storage";
 import { hashPassword } from "@/server/auth/password";
-import { hashToken, sha256Hex } from "@/server/auth/tokens";
+import { encryptSecret, hashToken, sha256Hex } from "@/server/auth/tokens";
 import { db } from "@/server/db";
+import { env } from "@/server/env";
 import { DEFAULT_STEP_TEMPLATES } from "@/server/domain/step-templates";
 import { computeProgress } from "@/server/domain/progress";
 import { seedStepTemplates } from "@/server/services/organizations";
@@ -303,6 +304,7 @@ export async function seedDemo() {
     const img = await demoPhoto(input.caption, input.variant, input.progress);
     const base = `org/${orgId}/media/${randomUUID()}`;
     await storage().put(`${base}/original.jpg`, img.original, "image/jpeg");
+    await storage().put(`${base}/display.jpg`, img.original, "image/jpeg");
     await storage().put(`${base}/thumb.jpg`, img.thumbnail, "image/jpeg");
     const time = at(input.day, input.hour, 15);
     await db.media.create({
@@ -315,6 +317,7 @@ export async function seedDemo() {
         source: input.source ?? "APP",
         storageKey: `${base}/original.jpg`,
         thumbnailKey: `${base}/thumb.jpg`,
+        displayKey: `${base}/display.jpg`,
         mimeType: "image/jpeg",
         sizeBytes: img.original.byteLength,
         originalName: "photo.jpg",
@@ -726,6 +729,7 @@ export async function seedDemo() {
       organizationId: orgId,
       siteId: siteDupont.id,
       tokenHash: hashToken(DEMO_PORTAL_TOKEN),
+      tokenCiphertext: encryptSecret(DEMO_PORTAL_TOKEN, env().APP_SECRET),
       createdById: users.owner.id,
     },
   });

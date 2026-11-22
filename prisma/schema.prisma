@@ -166,15 +166,15 @@ model Organization {
   siteCounter        Int                @default(0)
 
   // Settings
-  photosAutoApprove        Boolean @default(false)
-  officeCanValidatePhotos  Boolean @default(true)
-  summaryAutoSend          Boolean @default(false)
-  summaryHour              Int     @default(18)
-  reminderHour             Int     @default(19)
-  retentionDocumentsYears  Int     @default(10)
-  retentionMediaYears      Int     @default(10)
-  retentionPurgeEnabled    Boolean @default(false)
-  onboardingDismissed      Boolean @default(false)
+  photosAutoApprove       Boolean @default(false)
+  officeCanValidatePhotos Boolean @default(true)
+  summaryAutoSend         Boolean @default(false)
+  summaryHour             Int     @default(18)
+  reminderHour            Int     @default(19)
+  retentionDocumentsYears Int     @default(10)
+  retentionMediaYears     Int     @default(10)
+  retentionPurgeEnabled   Boolean @default(false)
+  onboardingDismissed     Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -291,9 +291,9 @@ model PasswordResetToken {
 // ───────────────────────────── Clients & sites ─────────────────────────────
 
 model Client {
-  id                    String                    @id @default(cuid())
+  id                    String                   @id @default(cuid())
   organizationId        String
-  type                  ClientType                @default(INDIVIDUAL)
+  type                  ClientType               @default(INDIVIDUAL)
   name                  String
   companyName           String?
   emails                String[]
@@ -301,11 +301,11 @@ model Client {
   addresses             String[]
   notes                 String?
   tags                  String[]
-  consentCommunications Boolean                   @default(false)
+  consentCommunications Boolean                  @default(false)
   archivedAt            DateTime?
   anonymizedAt          DateTime?
-  createdAt             DateTime                  @default(now())
-  updatedAt             DateTime                  @updatedAt
+  createdAt             DateTime                 @default(now())
+  updatedAt             DateTime                 @updatedAt
   /// Maintained by a database trigger (full-text search).
   searchVector          Unsupported("tsvector")?
 
@@ -506,6 +506,8 @@ model Media {
   thumbnailKey        String?
   /// Derived file (crop / blur). The original is kept intact.
   editedKey           String?
+  /// Display version: auto-rotated, resized, metadata (EXIF / GPS) stripped. Served to clients.
+  displayKey          String?
   width               Int?
   height              Int?
   durationSec         Float?
@@ -634,19 +636,21 @@ model DailySummary {
 }
 
 model ClientPortalLink {
-  id             String       @id @default(cuid())
-  organizationId String
-  siteId         String
-  /// SHA-256 of the token; the token itself is never stored.
-  tokenHash      String       @unique
-  expiresAt      DateTime?
-  revokedAt      DateTime?
-  lastAccessAt   DateTime?
-  accessCount    Int          @default(0)
-  createdById    String?
-  createdAt      DateTime     @default(now())
-  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
-  site           Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  id              String       @id @default(cuid())
+  organizationId  String
+  siteId          String
+  /// SHA-256 of the token (lookup). The token itself is never stored in clear.
+  tokenHash       String       @unique
+  /// Token encrypted with a key derived from APP_SECRET (AES-256-GCM), so managers can copy the link again.
+  tokenCiphertext String?
+  expiresAt       DateTime?
+  revokedAt       DateTime?
+  lastAccessAt    DateTime?
+  accessCount     Int          @default(0)
+  createdById     String?
+  createdAt       DateTime     @default(now())
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  site            Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
 
   @@index([organizationId])
   @@index([siteId])

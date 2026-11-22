@@ -93,3 +93,18 @@ describe("validation", () => {
     expect(safeRedirectPath(null, "/app")).toBe("/app");
   });
 });
+
+describe("secret encryption", () => {
+  it("round-trips and rejects tampering or another key", async () => {
+    const { decryptSecret, encryptSecret } = await import("@/server/auth/tokens");
+    const secret = "s".repeat(40);
+    const value = encryptSecret("jeton-du-client", secret);
+    expect(value).not.toContain("jeton");
+    expect(decryptSecret(value, secret)).toBe("jeton-du-client");
+    expect(decryptSecret(value, "t".repeat(40))).toBeNull();
+    const [iv, tag, data] = value.split(".");
+    const tampered = (data![0] === "A" ? "B" : "A") + data!.slice(1);
+    expect(decryptSecret([iv, tag, tampered].join("."), secret)).toBeNull();
+    expect(decryptSecret("pas-valide", secret)).toBeNull();
+  });
+});

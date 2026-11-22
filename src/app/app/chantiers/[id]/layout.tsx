@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { LateBadge, ProgressBar, SiteStatusBadge } from "@/components/app/status";
 import { requireManager } from "@/server/auth/context";
-import { NotFoundError } from "@/server/errors";
 import { getSite } from "@/server/services/sites";
+import { loadSite } from "./site-data";
 import { SiteStatusMenu } from "./site-status-menu";
 import { SiteTabs } from "./site-tabs";
 
@@ -23,10 +22,7 @@ export default async function SiteLayout({
 }) {
   const ctx = await requireManager();
   const { id } = await params;
-  const site = await getSite(ctx, id).catch((e: unknown) => {
-    if (e instanceof NotFoundError) notFound();
-    throw e;
-  });
+  const site = await loadSite(ctx, id);
 
   return (
     <div className="grid gap-4">
@@ -57,7 +53,7 @@ export default async function SiteLayout({
           <SiteStatusMenu siteId={site.id} status={site.status} />
         </div>
       </div>
-      <SiteTabs siteId={site.id} hidden={["photos", "espace-client"]} />
+      <SiteTabs siteId={site.id} />
       <div>{children}</div>
     </div>
   );

@@ -87,3 +87,21 @@ Format : date — décision — raison.
 - **Recherche globale** : route `GET /api/search` (session + limitation de débit) appelée par la palette `cmdk`
   sans filtrage côté client.
 - **Onglets « Photos » et « Espace client »** masqués jusqu'à la phase 3.
+
+## 2026-11-22 — Phase 3
+
+- **Lien client : SHA-256 pour la recherche + copie chiffrée (AES-256-GCM, clé dérivée de `APP_SECRET`)** afin que le
+  bureau puisse recopier / renvoyer le lien à tout moment. Une fuite de la base seule ne révèle aucun lien.
+  « Régénérer » révoque les liens actifs et en crée un nouveau.
+- **Photos : l'original n'est jamais servi au client.** Le traitement crée une version d'affichage (rotation EXIF
+  appliquée, 2000 px max, métadonnées EXIF/GPS supprimées) et une miniature ; recadrage / floutage produisent une
+  troisième copie. HEIC : non décodable par le libvips fourni avec sharp → conservé et téléchargeable, sans aperçu.
+- **Floutage manuel** : rectangles tracés à la souris / au doigt, flou gaussien appliqué par sharp.
+- **Envoi des médias par une route `POST /api/w/media`** (et non une Server Action) : utilisable par la file hors-ligne
+  et le service worker (phase 6), idempotente via `clientUploadId`, contrôle d'origine (CSRF).
+- **Tâches de fond : `JOBS_MODE=inline`** (exécution juste après la réponse via `after()`, aucun process en plus)
+  ou `queue` (pg-boss + process `worker`). Le mode local et les tests utilisent `inline`.
+- **Horloge** : une date de prise de vue dans le futur (téléphone mal réglé) est ignorée ; la date de réception serveur
+  fait foi.
+- **404 dans l'espace bureau** : les pages `/app` sont diffusées en streaming (état de chargement) ; un chantier
+  introuvable affiche la page « Page introuvable » dans un statut HTTP 200 (les pages `/w` et l'API renvoient 404).
