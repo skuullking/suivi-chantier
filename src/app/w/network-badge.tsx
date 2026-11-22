@@ -8,7 +8,7 @@ export function NetworkBadge() {
   if (online) return null;
   return (
     <span
-      className="ml-auto flex items-center gap-1 rounded-full bg-amber-400 px-2 py-0.5 text-xs font-bold text-amber-950"
+      className="bg-signal-400 text-ink-900 ml-auto flex items-center gap-1 rounded-md px-2 py-0.5 font-mono text-[11px] font-bold uppercase"
       role="status"
     >
       <WifiOff className="size-3.5" aria-hidden /> Hors ligne

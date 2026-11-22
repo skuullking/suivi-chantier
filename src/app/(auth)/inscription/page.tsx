@@ -13,7 +13,7 @@ export default async function SignUpPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle as="h1" className="text-xl">
+        <CardTitle as="h1" className="text-3xl">
           Créer mon entreprise
         </CardTitle>
         <CardDescription>14 jours d&apos;essai gratuit, sans carte bancaire.</CardDescription>
@@ -22,7 +22,7 @@ export default async function SignUpPage() {
         <SignUpForm />
         <p className="text-muted-foreground text-center text-sm">
           Déjà inscrit ?{" "}
-          <Link href="/connexion" className="text-primary font-medium hover:underline">
+          <Link href="/connexion" className="text-ink-900 font-semibold underline">
             Se connecter
           </Link>
         </p>

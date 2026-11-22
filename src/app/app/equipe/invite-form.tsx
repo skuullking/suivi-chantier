@@ -28,7 +28,7 @@ export function InviteForm() {
     <form ref={formRef} action={action} className="grid gap-4" noValidate>
       <FormAlert error={state.error} message={state.message} />
       {url ? (
-        <div className="grid gap-2 rounded-lg border bg-stone-50 p-3">
+        <div className="bg-ink-50 grid gap-2 rounded-lg border p-3">
           <p className="text-muted-foreground text-xs">Lien d&apos;invitation (affiché une seule fois) :</p>
           <code className="text-xs break-all" data-testid="invitation-link">
             {url}

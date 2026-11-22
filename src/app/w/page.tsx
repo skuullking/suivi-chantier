@@ -18,16 +18,18 @@ export default async function WorkerTodayPage() {
   return (
     <div className="grid gap-5">
       <div>
-        <h1 className="text-2xl font-bold">Bonjour {ctx.user.name.split(" ")[0]}</h1>
-        <p className="text-stone-600 capitalize">{formatDayLong(day)}</p>
+        <p className="label-mono text-ink-600">{formatDayLong(day)}</p>
+        <h1 className="mt-1 text-[2.4rem] leading-none font-extrabold">
+          Bonjour {ctx.user.name.split(" ")[0]}
+        </h1>
       </div>
 
       {sites.length === 0 ? (
-        <section className="rounded-2xl bg-white p-5 shadow-sm">
+        <section className="border-ink-200 rounded-2xl border bg-white p-5">
           <p className="text-lg font-semibold">Pas de chantier prévu aujourd&apos;hui.</p>
           {teamSites.length ? (
             <>
-              <p className="mt-1 text-stone-600">Vos chantiers en cours :</p>
+              <p className="text-ink-600 mt-1">Vos chantiers en cours :</p>
               <ul className="mt-3 grid gap-2">
                 {teamSites.map((s) => (
                   <li key={s.id}>
@@ -36,7 +38,7 @@ export default async function WorkerTodayPage() {
                       className="flex min-h-14 items-center justify-between rounded-xl border px-4 font-medium"
                     >
                       {s.title}
-                      <ChevronRight className="size-5 text-stone-400" aria-hidden />
+                      <ChevronRight className="text-ink-400 size-5" aria-hidden />
                     </Link>
                   </li>
                 ))}
@@ -54,18 +56,21 @@ export default async function WorkerTodayPage() {
           return (
             <section
               key={s.site.id}
-              className="grid gap-4 rounded-2xl bg-white p-4 shadow-sm"
+              className="border-ink-200 grid gap-4 rounded-2xl border bg-white p-4"
               data-testid="worker-site"
             >
               <div>
-                <p className="text-sm font-medium text-orange-700">
+                <p className="label-mono text-ink-600">
                   {s.startTime ? `${s.startTime} · ` : ""}
                   {SLOT_LABELS[s.slot]}
                 </p>
-                <Link href={`/w/chantier/${s.site.id}`} className="block text-xl font-bold">
+                <Link
+                  href={`/w/chantier/${s.site.id}`}
+                  className="font-heading mt-1 block text-2xl leading-tight font-extrabold tracking-tight"
+                >
                   {s.site.title}
                 </Link>
-                <p className="flex items-start gap-1 text-stone-600">
+                <p className="text-ink-600 flex items-start gap-1">
                   <MapPin className="mt-1 size-4 shrink-0" aria-hidden />
                   {s.site.address}
                   {s.site.city ? `, ${s.site.city}` : ""}
@@ -76,7 +81,7 @@ export default async function WorkerTodayPage() {
                   href={urls.google}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-14 items-center justify-center rounded-xl border-2 border-stone-800 text-base font-bold"
+                  className="bg-ink-900 flex min-h-14 items-center justify-center rounded-xl text-base font-bold text-white"
                 >
                   Y aller (Maps)
                 </a>
@@ -84,21 +89,21 @@ export default async function WorkerTodayPage() {
                   href={urls.waze}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex min-h-14 items-center justify-center rounded-xl border-2 border-stone-800 text-base font-bold"
+                  className="border-ink-900 flex min-h-14 items-center justify-center rounded-xl border-2 text-base font-bold"
                 >
                   Waze
                 </a>
               </div>
               {s.currentStep ? (
                 <div>
-                  <p className="text-sm text-stone-500">Étape en cours</p>
-                  <p className="text-lg font-semibold">{s.currentStep.title}</p>
+                  <p className="label-mono text-ink-600">Étape en cours</p>
+                  <p className="font-heading text-xl font-extrabold">{s.currentStep.title}</p>
                   <ProgressBar value={s.site.progress} className="mt-1" label="Avancement du chantier" />
                 </div>
               ) : null}
               {s.dayInstructions || s.site.instructions ? (
-                <div className="flex gap-2 rounded-xl bg-amber-50 p-3 text-amber-950">
-                  <Info className="mt-0.5 size-5 shrink-0" aria-hidden />
+                <div className="bg-ink-900 flex gap-2 rounded-xl p-3 text-white">
+                  <Info className="text-signal-400 mt-0.5 size-5 shrink-0" aria-hidden />
                   <div className="whitespace-pre-wrap">
                     {s.dayInstructions ? <p className="font-semibold">{s.dayInstructions}</p> : null}
                     {s.site.instructions ? <p>{s.site.instructions}</p> : null}
@@ -119,12 +124,12 @@ export default async function WorkerTodayPage() {
       )}
 
       {tomorrow.length ? (
-        <section className="flex items-start gap-3 rounded-2xl bg-white p-4 shadow-sm">
-          <CalendarClock className="mt-0.5 size-6 text-stone-500" aria-hidden />
+        <section className="border-ink-200 flex items-start gap-3 rounded-2xl border bg-white p-4">
+          <CalendarClock className="text-ink-500 mt-0.5 size-6" aria-hidden />
           <div>
             <p className="font-semibold">Demain</p>
             {tomorrow.map((a) => (
-              <p key={a.id} className="text-stone-700">
+              <p key={a.id} className="text-ink-700">
                 {a.site.title}
                 {a.startTime ? `, ${a.startTime.replace(":", " h ")}` : ""}
               </p>

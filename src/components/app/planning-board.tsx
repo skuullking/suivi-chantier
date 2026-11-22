@@ -46,11 +46,11 @@ type Row = { id: string; label: string; sublabel?: string };
 type DayCol = { key: string; label: string; weekday: string; isToday: boolean; outside?: boolean };
 
 const SITE_COLORS = [
-  "bg-orange-100 border-orange-300 text-orange-950",
-  "bg-sky-100 border-sky-300 text-sky-950",
+  "bg-signal-100 border-signal-300 text-signal-950",
+  "bg-ink-100 border-ink-200 text-ink-900",
   "bg-emerald-100 border-emerald-300 text-emerald-950",
-  "bg-violet-100 border-violet-300 text-violet-950",
-  "bg-amber-100 border-amber-300 text-amber-950",
+  "bg-ink-100 border-ink-200 text-ink-900",
+  "bg-signal-100 border-signal-400 text-ink-900",
   "bg-rose-100 border-rose-300 text-rose-950",
   "bg-teal-100 border-teal-300 text-teal-950",
 ];
@@ -129,8 +129,8 @@ export function PlanningBoard({
         <div className="overflow-x-auto rounded-xl border bg-white">
           <table className="w-full min-w-[900px] table-fixed border-collapse text-sm">
             <thead>
-              <tr className="bg-stone-50">
-                <th className="w-44 border-b px-3 py-2 text-left text-xs font-medium text-stone-600 uppercase">
+              <tr className="bg-ink-50">
+                <th className="text-ink-600 w-44 border-b px-3 py-2 text-left text-xs font-medium uppercase">
                   {groupBy === "person" ? "Personne" : "Chantier"}
                 </th>
                 {days.map((d) => (
@@ -138,7 +138,7 @@ export function PlanningBoard({
                     key={d.key}
                     className={cn(
                       "border-b border-l px-2 py-2 text-left text-xs font-medium",
-                      d.isToday ? "bg-orange-50 text-orange-800" : "text-stone-600",
+                      d.isToday ? "bg-signal-50 text-signal-800" : "text-ink-600",
                     )}
                   >
                     <span className="capitalize">{d.weekday}</span> {d.label}
@@ -195,11 +195,11 @@ export function PlanningBoard({
         <div className="overflow-x-auto rounded-xl border bg-white">
           <table className="w-full min-w-[800px] table-fixed border-collapse text-sm">
             <thead>
-              <tr className="bg-stone-50">
+              <tr className="bg-ink-50">
                 {(weeks?.[0] ?? []).map((d) => (
                   <th
                     key={d.key}
-                    className="border-b px-2 py-2 text-left text-xs font-medium text-stone-600 capitalize"
+                    className="text-ink-600 border-b px-2 py-2 text-left text-xs font-medium capitalize"
                   >
                     {d.weekday}
                   </th>
@@ -277,9 +277,9 @@ function DropCell({
       className={cn(
         "group border-b border-l p-1 align-top",
         tall ? "h-28" : "h-20",
-        highlight && "bg-orange-50/40",
-        muted && "bg-stone-50 text-stone-400",
-        isOver && "bg-orange-100",
+        highlight && "bg-signal-50/40",
+        muted && "bg-ink-50 text-ink-400",
+        isOver && "bg-signal-100",
       )}
     >
       <div className="flex h-full flex-col gap-1">
@@ -289,7 +289,7 @@ function DropCell({
           type="button"
           onClick={onAdd}
           aria-label={addLabel}
-          className="mt-auto flex items-center justify-center rounded border border-dashed border-transparent py-0.5 text-stone-400 opacity-0 group-hover:border-stone-300 group-hover:opacity-100 focus:opacity-100"
+          className="text-ink-400 group-hover:border-ink-300 mt-auto flex items-center justify-center rounded border border-dashed border-transparent py-0.5 opacity-0 group-hover:opacity-100 focus:opacity-100"
         >
           <Plus className="size-3.5" />
         </button>

@@ -85,10 +85,10 @@ export function UploadZone({
         }}
         className={cn(
           "flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-8 text-center transition-colors",
-          dragging ? "border-orange-500 bg-orange-50" : "border-stone-300 bg-white hover:border-orange-400",
+          dragging ? "border-signal-500 bg-signal-50" : "border-ink-300 hover:border-signal-400 bg-white",
         )}
       >
-        <FileUp className="size-8 text-stone-400" aria-hidden />
+        <FileUp className="text-ink-400 size-8" aria-hidden />
         <p className="text-sm font-medium">Glissez vos fichiers ici ou cliquez pour choisir</p>
         <p className="text-muted-foreground text-xs">PDF, images, Word, Excel — 20 fichiers maximum</p>
         <input
@@ -112,7 +112,7 @@ export function UploadZone({
                 <span className="text-muted-foreground text-xs">{formatBytes(f.size)}</span>
                 <button
                   type="button"
-                  className="rounded p-1 hover:bg-stone-100"
+                  className="hover:bg-ink-100 rounded p-1"
                   aria-label={`Retirer ${f.name}`}
                   onClick={() => setFiles((cur) => cur.filter((_, j) => j !== i))}
                 >

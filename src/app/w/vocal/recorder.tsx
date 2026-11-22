@@ -123,7 +123,7 @@ export function VoiceRecorder({
           aria-pressed={recording}
           className={cn(
             "flex size-44 items-center justify-center rounded-full text-white shadow-xl transition active:scale-95",
-            recording ? "animate-pulse bg-red-600" : "bg-sky-700",
+            recording ? "animate-pulse bg-red-600" : "bg-ink-800",
           )}
         >
           {recording ? <Square className="size-16" fill="currentColor" /> : <Mic className="size-20" />}
@@ -131,7 +131,7 @@ export function VoiceRecorder({
         <p className="text-3xl font-bold tabular-nums" aria-live="polite">
           {recording ? `${mm}:${ss}` : "Appuyez pour parler"}
         </p>
-        <p className="text-center text-stone-600">
+        <p className="text-ink-600 text-center">
           {recording
             ? "Appuyez à nouveau pour arrêter : le vocal part tout seul."
             : "Le message est transcrit et ajouté au journal du chantier."}
@@ -157,13 +157,13 @@ export function VoiceRecorder({
             .map((item) => ({ ...item, ...(statuses[item.key] ?? { status: "sending" as const }) }))
             .map((s) => (
               <li key={s.key} className="flex min-h-12 items-center gap-3 rounded-xl bg-white px-4">
-                <Mic className="size-5 text-sky-700" aria-hidden />
+                <Mic className="text-ink-800 size-5" aria-hidden />
                 <span className="flex-1">Vocal {s.seconds ? `de ${s.seconds} s` : ""}</span>
                 {s.status === "sent" ? (
                   <Check className="size-5 text-emerald-600" aria-label="Envoyé" />
                 ) : null}
                 {s.status === "sending" || s.status === "waiting" ? (
-                  <Clock className="size-5 text-amber-600" aria-label="En attente" />
+                  <Clock className="text-ink-900 size-5" aria-label="En attente" />
                 ) : null}
                 {s.status === "error" ? <X className="size-5 text-red-600" aria-label={s.error} /> : null}
               </li>

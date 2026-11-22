@@ -62,17 +62,17 @@ export function InboxItemCard({
   return (
     <article className="grid gap-3 rounded-xl border bg-white p-4" data-testid="inbox-item">
       <div className="flex gap-3">
-        <div className="size-24 shrink-0 overflow-hidden rounded-lg bg-stone-100">
+        <div className="bg-ink-100 size-24 shrink-0 overflow-hidden rounded-lg">
           {item.preview.kind === "photo" ? (
             // eslint-disable-next-line @next/next/no-img-element -- signed private URL
             <img src={item.preview.url} alt="Photo reçue" className="size-full object-cover" />
           ) : item.preview.kind === "audio" ? (
             <div className="flex size-full items-center justify-center">
-              <Mic className="size-8 text-sky-700" aria-hidden />
+              <Mic className="text-ink-800 size-8" aria-hidden />
             </div>
           ) : (
             <div className="flex size-full items-center justify-center">
-              <FileText className="size-8 text-stone-500" aria-hidden />
+              <FileText className="text-ink-500 size-8" aria-hidden />
             </div>
           )}
         </div>
@@ -102,7 +102,7 @@ export function InboxItemCard({
               href={item.preview.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-1 block truncate text-orange-700 underline"
+              className="text-signal-700 mt-1 block truncate underline"
             >
               {item.preview.name}
             </a>
@@ -110,12 +110,12 @@ export function InboxItemCard({
         </div>
       </div>
 
-      <div className="rounded-lg bg-stone-50 p-3 text-sm">
+      <div className="bg-ink-50 rounded-lg p-3 text-sm">
         <p className="text-muted-foreground text-xs uppercase">Proposition</p>
         {item.proposedLabel ? (
           <p className="font-medium">{item.proposedLabel}</p>
         ) : (
-          <p className="text-stone-500">Aucune proposition</p>
+          <p className="text-ink-500">Aucune proposition</p>
         )}
         {confidence !== null ? (
           <p className="text-xs">
@@ -123,7 +123,7 @@ export function InboxItemCard({
             <span
               className={cn(
                 "font-semibold",
-                confidence >= 75 ? "text-emerald-700" : confidence >= 40 ? "text-amber-700" : "text-red-700",
+                confidence >= 75 ? "text-emerald-700" : confidence >= 40 ? "text-ink-900" : "text-red-700",
               )}
             >
               {confidence} %
@@ -259,10 +259,7 @@ export function SummaryCard({
   }
   const [pending, startTransition] = useTransition();
   return (
-    <article
-      className="grid gap-3 rounded-xl border border-violet-200 bg-white p-4"
-      data-testid="summary-draft"
-    >
+    <article className="border-ink-200 grid gap-3 rounded-xl border bg-white p-4" data-testid="summary-draft">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <Link href={`/app/chantiers/${summary.siteId}/journal`} className="font-semibold hover:underline">
           {summary.siteTitle}

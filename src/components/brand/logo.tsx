@@ -4,28 +4,50 @@ import { cn } from "@/lib/utils";
 export function LogoMark({ className }: { className?: string }) {
   return (
     <svg viewBox="0 0 32 32" aria-hidden className={cn("size-8", className)}>
-      <rect width="32" height="32" rx="8" fill="#c2410c" />
+      <rect
+        x="0.75"
+        y="0.75"
+        width="30.5"
+        height="30.5"
+        rx="8"
+        fill="#ffd400"
+        stroke="#121212"
+        strokeWidth="1.5"
+      />
       <path
-        d="M7 21 16 9l9 12"
+        d="M8 22 16 10l8 12M12 22h8"
         fill="none"
-        stroke="#fff"
+        stroke="#121212"
         strokeWidth="3"
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M11 21h10v3H11z" fill="#fff" />
     </svg>
   );
 }
 
-export function Logo({ href = "/", className }: { href?: string; className?: string }) {
+export function Logo({
+  href = "/",
+  className,
+  tone = "dark",
+}: {
+  href?: string;
+  className?: string;
+  /** "dark" text on light backgrounds, "light" text on ink backgrounds. */
+  tone?: "dark" | "light";
+}) {
   return (
     <Link
       href={href}
-      className={cn("inline-flex items-center gap-2 font-semibold tracking-tight", className)}
+      aria-label="ChantierLink"
+      className={cn(
+        "font-heading inline-flex items-center gap-2.5 text-[1.3rem] font-extrabold tracking-[-0.03em]",
+        tone === "light" ? "text-white" : "text-ink-900",
+        className,
+      )}
     >
       <LogoMark />
-      <span className="text-lg">ChantierLink</span>
+      <span aria-hidden>chantierlink</span>
     </Link>
   );
 }

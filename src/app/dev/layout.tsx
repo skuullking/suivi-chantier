@@ -16,20 +16,20 @@ const LINKS = [
 export default function DevLayout({ children }: { children: React.ReactNode }) {
   if (!devToolsEnabled()) notFound();
   return (
-    <div className="min-h-screen bg-stone-100">
-      <header className="border-b bg-amber-50">
+    <div className="bg-ink-100 min-h-screen">
+      <header className="bg-signal-50 border-b">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-4 px-4 py-3">
           <Link href="/" className="flex items-center gap-2 font-semibold">
             <LogoMark className="size-6" /> Outils de dev
           </Link>
           <nav className="flex flex-wrap gap-3 text-sm">
             {LINKS.map((l) => (
-              <Link key={l.href} href={l.href} className="text-stone-700 hover:underline">
+              <Link key={l.href} href={l.href} className="text-ink-700 hover:underline">
                 {l.label}
               </Link>
             ))}
           </nav>
-          <span className="ml-auto rounded bg-amber-200 px-2 py-0.5 text-xs font-medium text-amber-900">
+          <span className="bg-signal-200 text-ink-900 ml-auto rounded px-2 py-0.5 text-xs font-medium">
             Simulation — aucune donnée réelle n&apos;est envoyée
           </span>
         </div>

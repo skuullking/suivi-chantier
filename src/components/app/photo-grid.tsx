@@ -24,7 +24,7 @@ export type GridPhoto = {
 };
 
 const STATUS_STYLE = {
-  PENDING: "bg-amber-500",
+  PENDING: "bg-signal-400",
   APPROVED: "bg-emerald-600",
   REJECTED: "bg-red-600",
 } as const;
@@ -161,8 +161,8 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
               onClick={(e) => (e.shiftKey || e.metaKey || e.ctrlKey ? toggle(p.id) : setOpen(p))}
               aria-label={`Photo ${p.caption ?? ""} — ${STATUS_LABEL[p.status]}${selected.has(p.id) ? ", sélectionnée" : ""}`}
               className={cn(
-                "block aspect-[4/3] w-full overflow-hidden rounded-xl border-2 bg-stone-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-orange-400",
-                selected.has(p.id) ? "border-orange-500" : "border-transparent",
+                "bg-ink-200 focus-visible:ring-signal-400 block aspect-[4/3] w-full overflow-hidden rounded-xl border-2 focus:outline-none focus-visible:ring-4",
+                selected.has(p.id) ? "border-signal-500" : "border-transparent",
               )}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- signed private URL */}
@@ -176,7 +176,7 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
             {canValidate ? (
               <input
                 type="checkbox"
-                className="absolute top-2 left-2 size-5 accent-orange-600"
+                className="accent-signal-600 absolute top-2 left-2 size-5"
                 checked={selected.has(p.id)}
                 onChange={() => toggle(p.id)}
                 aria-label="Sélectionner"
@@ -190,7 +190,7 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
             >
               {STATUS_LABEL[p.status]}
             </span>
-            <p className="mt-1 truncate text-xs text-stone-700">
+            <p className="text-ink-700 mt-1 truncate text-xs">
               {p.caption ?? p.step ?? "Sans légende"}
               {p.edited ? " · retouchée" : ""}
             </p>
@@ -316,8 +316,8 @@ function PhotoViewer({
                   className={cn(
                     "pointer-events-none absolute border-2",
                     r.kind === "crop"
-                      ? "border-orange-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]"
-                      : "border-sky-400 bg-sky-400/30 backdrop-blur-md",
+                      ? "border-signal-500 shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]"
+                      : "border-ink-800 bg-ink-800/30 backdrop-blur-md",
                   )}
                   style={{
                     left: `${r.x * 100}%`,

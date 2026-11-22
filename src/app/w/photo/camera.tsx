@@ -167,7 +167,7 @@ export function CameraCapture({
         <button
           type="button"
           onClick={() => fileInput.current?.click()}
-          className="flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 border-stone-800 bg-white text-base font-bold"
+          className="border-ink-800 flex min-h-14 items-center justify-center gap-2 rounded-xl border-2 bg-white text-base font-bold"
         >
           <ImagePlus className="size-6" aria-hidden />
           {cameraState === "unavailable" ? "Prendre une photo" : "Choisir dans la galerie"}
@@ -194,7 +194,7 @@ export function CameraCapture({
               .map((s) => (
                 <li
                   key={s.key}
-                  className="relative aspect-square overflow-hidden rounded-lg bg-stone-200"
+                  className="bg-ink-200 relative aspect-square overflow-hidden rounded-lg"
                   data-testid="sent-photo"
                   data-status={s.status}
                 >
@@ -204,8 +204,8 @@ export function CameraCapture({
                     className={cn(
                       "absolute right-1 bottom-1 flex size-6 items-center justify-center rounded-full text-white",
                       s.status === "sent" && "bg-emerald-600",
-                      s.status === "sending" && "bg-stone-700",
-                      s.status === "waiting" && "bg-amber-600",
+                      s.status === "sending" && "bg-ink-700",
+                      s.status === "waiting" && "bg-ink-900",
                       s.status === "error" && "bg-red-600",
                     )}
                     title={s.error}
@@ -228,7 +228,7 @@ export function CameraCapture({
               ))}
           </ul>
         ) : (
-          <p className="text-center text-sm text-stone-500">
+          <p className="text-ink-500 text-center text-sm">
             Un appui = photo envoyée au chantier sélectionné.
           </p>
         )}

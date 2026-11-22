@@ -27,7 +27,7 @@ function StepCard({
         <span
           className={cn(
             "flex size-8 shrink-0 items-center justify-center rounded-full text-sm font-bold",
-            done ? "bg-emerald-600 text-white" : "bg-orange-100 text-orange-800",
+            done ? "bg-emerald-600 text-white" : "bg-signal-100 text-signal-800",
           )}
         >
           {done ? <Check className="size-4" aria-label="Fait" /> : index}
@@ -75,10 +75,10 @@ export function OnboardingSteps(props: {
           </select>
           <span className="text-muted-foreground">Modèle d&apos;étapes chargé :</span>
         </div>
-        <p className="text-stone-700">
+        <p className="text-ink-700">
           {steps.length ? steps.join(" → ") : "Vous créerez vos propres étapes."}
         </p>
-        <Link href="/app/parametres/modeles" className="w-fit text-orange-700 hover:underline">
+        <Link href="/app/parametres/modeles" className="text-signal-700 w-fit hover:underline">
           Personnaliser les modèles
         </Link>
       </StepCard>
@@ -99,7 +99,7 @@ export function OnboardingSteps(props: {
             Premier chantier :{" "}
             <Link
               href={`/app/chantiers/${props.firstSite.id}`}
-              className="font-medium text-orange-700 hover:underline"
+              className="text-signal-700 font-medium hover:underline"
             >
               {props.firstSite.title}
             </Link>
@@ -141,7 +141,7 @@ export function OnboardingSteps(props: {
         {portalUrl ? (
           <div className="flex flex-wrap items-center gap-2">
             <code
-              className="max-w-full truncate rounded bg-stone-100 px-2 py-1 text-xs"
+              className="bg-ink-100 max-w-full truncate rounded px-2 py-1 text-xs"
               data-testid="onboarding-portal-url"
             >
               {portalUrl}

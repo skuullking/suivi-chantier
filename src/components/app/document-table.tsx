@@ -49,7 +49,7 @@ export function DocumentTable({
   return (
     <div className="overflow-x-auto rounded-xl border bg-white">
       <table className="w-full text-sm">
-        <thead className="bg-stone-50 text-left text-xs text-stone-600 uppercase">
+        <thead className="bg-ink-50 text-ink-600 text-left text-xs uppercase">
           <tr>
             <th className="px-4 py-3 font-medium">Document</th>
             <th className="hidden px-4 py-3 font-medium sm:table-cell">Type</th>
@@ -71,11 +71,11 @@ export function DocumentTable({
               <tr
                 key={d.id}
                 data-testid="document-row"
-                className={highlightId === d.id ? "bg-orange-50" : "hover:bg-stone-50"}
+                className={highlightId === d.id ? "bg-signal-50" : "hover:bg-ink-50"}
               >
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <Icon className="size-4 shrink-0 text-stone-400" aria-hidden />
+                    <Icon className="text-ink-400 size-4 shrink-0" aria-hidden />
                     <div className="min-w-0">
                       <a
                         href={urls.preview}

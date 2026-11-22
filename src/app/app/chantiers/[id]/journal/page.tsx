@@ -46,12 +46,12 @@ export default async function SiteJournalPage({ params }: { params: Promise<{ id
               summaries.map((s) => (
                 <article key={s.id} className="rounded-lg border p-3" data-testid="journal-summary">
                   <p className="flex items-center gap-2 text-sm font-medium capitalize">
-                    <Sparkles className="size-4 text-orange-600" aria-hidden /> {formatDayLong(s.date)}
+                    <Sparkles className="text-signal-600 size-4" aria-hidden /> {formatDayLong(s.date)}
                     <span className="text-muted-foreground text-xs font-normal normal-case">
                       — {SUMMARY_LABELS[s.status]}
                     </span>
                   </p>
-                  <p className="mt-1 text-sm whitespace-pre-wrap text-stone-700">
+                  <p className="text-ink-700 mt-1 text-sm whitespace-pre-wrap">
                     {s.editedText ?? s.generatedText}
                   </p>
                 </article>
@@ -79,12 +79,12 @@ export default async function SiteJournalPage({ params }: { params: Promise<{ id
                       : "rounded-lg border p-3"
                   }
                 >
-                  <p className="flex flex-wrap items-center gap-2 text-xs text-stone-600">
+                  <p className="text-ink-600 flex flex-wrap items-center gap-2 text-xs">
                     <Icon
-                      className={n.kind === "PROBLEM" ? "size-4 text-red-600" : "size-4 text-stone-400"}
+                      className={n.kind === "PROBLEM" ? "size-4 text-red-600" : "text-ink-400 size-4"}
                       aria-hidden
                     />
-                    <strong className="text-stone-800">{n.author?.name ?? "Système"}</strong>
+                    <strong className="text-ink-800">{n.author?.name ?? "Système"}</strong>
                     {formatDateTime(n.createdAt)}
                     {n.kind === "PROBLEM" ? (
                       <span className="font-semibold text-red-700">Problème</span>
@@ -115,7 +115,7 @@ export default async function SiteJournalPage({ params }: { params: Promise<{ id
         <CardContent>
           <ol className="grid gap-3 text-sm">
             {events.map((e) => (
-              <li key={e.id} className="border-l-2 border-stone-200 pl-3">
+              <li key={e.id} className="border-ink-200 border-l-2 pl-3">
                 <p>
                   <strong>{e.actorName ?? "ChantierLink"}</strong> {describeEvent(e.type, e.payload)}
                 </p>

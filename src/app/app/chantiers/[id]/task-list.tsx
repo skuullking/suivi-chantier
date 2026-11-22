@@ -41,7 +41,7 @@ export function TaskList({
       {optimistic.length === 0 ? <p className="text-muted-foreground text-sm">Aucune tâche.</p> : null}
       <ul className="grid gap-1">
         {optimistic.map((t) => (
-          <li key={t.id} className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-stone-50">
+          <li key={t.id} className="hover:bg-ink-50 flex items-center gap-3 rounded-lg px-2 py-1.5">
             <Checkbox
               id={`task-${t.id}`}
               checked={t.done}
@@ -53,7 +53,7 @@ export function TaskList({
               }
             />
             <label htmlFor={`task-${t.id}`} className="flex-1 text-sm">
-              <span className={t.done ? "text-stone-400 line-through" : ""}>{t.title}</span>
+              <span className={t.done ? "text-ink-400 line-through" : ""}>{t.title}</span>
               <span className="text-muted-foreground block text-xs">
                 {[t.date, t.assignee].filter(Boolean).join(" · ") || "Sans date"}
               </span>
@@ -71,7 +71,7 @@ export function TaskList({
       </ul>
       <form
         action={formAction}
-        className="grid gap-2 rounded-lg border bg-stone-50 p-3 sm:grid-cols-[1fr_auto_auto]"
+        className="bg-ink-50 grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_auto_auto]"
       >
         <input type="hidden" name="siteId" value={siteId} />
         <div className="sm:col-span-3">

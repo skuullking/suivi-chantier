@@ -25,7 +25,7 @@ export default async function AuditPage({ searchParams }: { searchParams: Promis
       />
       <div className="overflow-x-auto rounded-xl border bg-white">
         <table className="w-full text-sm">
-          <thead className="bg-stone-50 text-left text-xs text-stone-600 uppercase">
+          <thead className="bg-ink-50 text-ink-600 text-left text-xs uppercase">
             <tr>
               <th className="px-4 py-3 font-medium">Date</th>
               <th className="px-4 py-3 font-medium">Qui</th>

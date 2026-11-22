@@ -15,7 +15,7 @@ export default async function InvitationPage({ params }: { params: Promise<{ tok
     return (
       <Card>
         <CardHeader>
-          <CardTitle as="h1" className="text-xl">
+          <CardTitle as="h1" className="text-3xl">
             Invitation expirée
           </CardTitle>
           <CardDescription>
@@ -34,7 +34,7 @@ export default async function InvitationPage({ params }: { params: Promise<{ tok
   return (
     <Card>
       <CardHeader>
-        <CardTitle as="h1" className="text-xl">
+        <CardTitle as="h1" className="text-3xl">
           Rejoindre {invitation.organization.name}
         </CardTitle>
         <CardDescription>

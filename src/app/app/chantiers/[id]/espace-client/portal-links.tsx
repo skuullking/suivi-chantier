@@ -108,7 +108,7 @@ export function PortalLinks(props: {
             ) : null}
           </div>
           {!props.consent ? (
-            <p className="text-xs text-amber-800">
+            <p className="text-ink-900 text-xs">
               Le client n&apos;a pas donné son accord pour recevoir des messages : envoyez-lui le lien
               seulement s&apos;il l&apos;a demandé.
             </p>

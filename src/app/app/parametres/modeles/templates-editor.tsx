@@ -34,7 +34,7 @@ export function TemplatesEditor({ templates }: { templates: Template[] }) {
             aria-current={!draft && selected === t.id ? "true" : undefined}
             className={cn(
               "rounded-lg border px-3 py-2 text-left text-sm",
-              !draft && selected === t.id ? "border-orange-400 bg-orange-50" : "bg-white hover:bg-stone-50",
+              !draft && selected === t.id ? "border-signal-400 bg-signal-50" : "hover:bg-ink-50 bg-white",
             )}
           >
             <span className="font-medium">{t.name}</span>
@@ -129,7 +129,7 @@ function TemplateForm({
         <ol className="grid gap-2" aria-label="Étapes du modèle">
           {items.map((item, i) => (
             <li key={i} className="flex flex-wrap items-center gap-2 rounded-lg border bg-white p-2">
-              <span className="w-6 text-right text-sm text-stone-400 tabular-nums">{i + 1}</span>
+              <span className="text-ink-400 w-6 text-right text-sm tabular-nums">{i + 1}</span>
               <Input
                 value={item.title}
                 onChange={(e) => update(i, { title: e.target.value })}

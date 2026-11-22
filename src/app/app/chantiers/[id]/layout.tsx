@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { LateBadge, ProgressBar, SiteStatusBadge } from "@/components/app/status";
+import { LateBadge, ProgressBar, SiteStatusBadge, StepRibbon } from "@/components/app/status";
 import { requireManager } from "@/server/auth/context";
 import { getSite } from "@/server/services/sites";
 import { loadSite } from "./site-data";
@@ -25,21 +25,22 @@ export default async function SiteLayout({
   const site = await loadSite(ctx, id);
 
   return (
-    <div className="grid gap-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+    <div className="grid gap-5">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div className="min-w-0">
-          <p className="text-muted-foreground text-sm">
+          <p className="label-mono text-ink-600">
             <Link href="/app/chantiers" className="hover:underline">
               Chantiers
             </Link>{" "}
-            / <span className="font-mono">{site.code}</span>
+            / {site.code}
           </p>
-          <h1 className="text-2xl font-bold tracking-tight text-stone-900">{site.title}</h1>
-          <p className="text-muted-foreground mt-1 flex flex-wrap items-center gap-2 text-sm">
-            <Link href={`/app/clients/${site.client.id}`} className="hover:underline">
+          <h1 className="text-ink-900 mt-2 text-3xl leading-none font-extrabold sm:text-[2.6rem]">
+            {site.title}
+          </h1>
+          <p className="text-ink-700 mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-sm">
+            <Link href={`/app/clients/${site.client.id}`} className="font-medium hover:underline">
               {site.client.name}
             </Link>
-            <span aria-hidden>·</span>
             <span>
               {site.address}
               {site.city ? `, ${site.city}` : ""}
@@ -48,8 +49,11 @@ export default async function SiteLayout({
             {site.lateness.late ? <LateBadge /> : null}
           </p>
         </div>
-        <div className="flex items-center gap-3 lg:w-96">
-          <ProgressBar value={site.progress} className="flex-1" label="Progression du chantier" />
+        <div className="flex items-center gap-3 lg:w-[400px]">
+          <div className="min-w-0 flex-1">
+            <StepRibbon steps={site.steps} size="sm" className="mb-2" />
+            <ProgressBar value={site.progress} label="Progression du chantier" />
+          </div>
           <SiteStatusMenu siteId={site.id} status={site.status} />
         </div>
       </div>

@@ -82,13 +82,13 @@ export function CommandPalette() {
     <>
       <Button
         variant="outline"
-        className="text-muted-foreground h-9 w-full max-w-xs justify-start gap-2 font-normal"
+        className="text-muted-foreground border-ink-200 h-11 w-full max-w-[520px] justify-start gap-2.5 bg-white font-normal"
         onClick={() => setOpen(true)}
         aria-label="Rechercher (Ctrl+K)"
       >
         <Search className="size-4" aria-hidden />
         <span className="flex-1 text-left">Rechercher…</span>
-        <kbd className="hidden rounded border bg-stone-50 px-1.5 text-[10px] font-medium sm:inline">
+        <kbd className="bg-ink-50 text-ink-600 hidden rounded-md px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase sm:inline">
           Ctrl K
         </kbd>
       </Button>

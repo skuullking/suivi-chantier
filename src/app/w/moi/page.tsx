@@ -16,10 +16,10 @@ export default async function MePage() {
     <div className="grid gap-4">
       <section className="rounded-2xl bg-white p-5 shadow-sm">
         <h1 className="text-2xl font-bold">{ctx.user.name}</h1>
-        <p className="text-stone-600">
+        <p className="text-ink-600">
           {ROLE_LABELS[ctx.role]} · {ctx.organization.name}
         </p>
-        <div className="mt-3 grid gap-1 text-stone-700">
+        <div className="text-ink-700 mt-3 grid gap-1">
           <p className="flex items-center gap-2">
             <Mail className="size-4" aria-hidden /> {ctx.user.email}
           </p>
@@ -35,7 +35,7 @@ export default async function MePage() {
       <form action={signOutAction}>
         <button
           type="submit"
-          className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 border-stone-800 bg-white text-lg font-bold"
+          className="border-ink-800 flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 bg-white text-lg font-bold"
         >
           <LogOut className="size-5" aria-hidden /> Se déconnecter
         </button>

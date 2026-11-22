@@ -50,7 +50,7 @@ export default async function SiteSummaryPage({ params }: { params: Promise<{ id
               </span>
             </p>
             {next ? (
-              <div className="rounded-lg border bg-orange-50/50 p-3">
+              <div className="bg-signal-50/50 rounded-lg border p-3">
                 <p className="text-muted-foreground text-xs uppercase">Prochaine étape</p>
                 <p className="flex flex-wrap items-center gap-2 font-medium">
                   {next.title} <StepStatusBadge status={next.status} />
@@ -75,8 +75,8 @@ export default async function SiteSummaryPage({ params }: { params: Promise<{ id
             <ol className="grid gap-1 text-sm">
               {site.steps.map((s) => (
                 <li key={s.id} className="flex items-center gap-2">
-                  <span className="w-5 text-right text-xs text-stone-400 tabular-nums">{s.order}</span>
-                  <span className={s.status === "DONE" ? "text-stone-500 line-through" : ""}>{s.title}</span>
+                  <span className="text-ink-400 w-5 text-right text-xs tabular-nums">{s.order}</span>
+                  <span className={s.status === "DONE" ? "text-ink-500 line-through" : ""}>{s.title}</span>
                   <StepStatusBadge status={s.status} />
                   {lateIds.has(s.id) ? <LateBadge /> : null}
                 </li>
@@ -140,19 +140,17 @@ export default async function SiteSummaryPage({ params }: { params: Promise<{ id
               </div>
             </div>
             <p className="flex items-center gap-2">
-              <CalendarDays className="size-4 text-stone-400" aria-hidden />
+              <CalendarDays className="text-ink-400 size-4" aria-hidden />
               {formatDay(site.plannedStart)} → {formatDay(site.plannedEnd)}
             </p>
             {site.actualStart ? (
               <p className="text-muted-foreground text-xs">Démarré le {formatDay(site.actualStart)}</p>
             ) : null}
-            {site.description ? (
-              <p className="whitespace-pre-wrap text-stone-700">{site.description}</p>
-            ) : null}
+            {site.description ? <p className="text-ink-700 whitespace-pre-wrap">{site.description}</p> : null}
             {site.instructions ? (
-              <div className="rounded-lg bg-amber-50 p-3">
-                <p className="text-xs font-semibold text-amber-900 uppercase">Consignes équipe</p>
-                <p className="whitespace-pre-wrap text-amber-950">{site.instructions}</p>
+              <div className="bg-signal-50 rounded-lg p-3">
+                <p className="text-ink-900 text-xs font-semibold uppercase">Consignes équipe</p>
+                <p className="text-ink-900 whitespace-pre-wrap">{site.instructions}</p>
               </div>
             ) : null}
             <div className="border-t pt-3">
@@ -163,9 +161,9 @@ export default async function SiteSummaryPage({ params }: { params: Promise<{ id
               {site.client.phones[0] ? (
                 <a
                   href={`tel:${site.client.phones[0].replace(/\s/g, "")}`}
-                  className="flex items-center gap-2 text-stone-700 hover:underline"
+                  className="text-ink-700 flex items-center gap-2 hover:underline"
                 >
-                  <Phone className="size-4 text-stone-400" aria-hidden /> {site.client.phones[0]}
+                  <Phone className="text-ink-400 size-4" aria-hidden /> {site.client.phones[0]}
                 </a>
               ) : null}
             </div>
@@ -192,7 +190,7 @@ export default async function SiteSummaryPage({ params }: { params: Promise<{ id
             ) : (
               site.members.map((m) => (
                 <p key={m.userId} className="flex items-center gap-2">
-                  <Users className="size-4 text-stone-400" aria-hidden /> {m.user.name}
+                  <Users className="text-ink-400 size-4" aria-hidden /> {m.user.name}
                 </p>
               ))
             )}

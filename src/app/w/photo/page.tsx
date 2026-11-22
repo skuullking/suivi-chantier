@@ -14,10 +14,8 @@ export default async function PhotoPage({ searchParams }: { searchParams: Promis
     return (
       <div className="rounded-2xl bg-white p-5 shadow-sm">
         <p className="text-lg font-semibold">Aucun chantier pour l&apos;instant.</p>
-        <p className="text-stone-600">
-          Demandez au bureau de vous ajouter à l&apos;équipe d&apos;un chantier.
-        </p>
-        <Link href="/w" className="mt-4 inline-block font-semibold text-orange-700 underline">
+        <p className="text-ink-600">Demandez au bureau de vous ajouter à l&apos;équipe d&apos;un chantier.</p>
+        <Link href="/w" className="text-signal-700 mt-4 inline-block font-semibold underline">
           Retour
         </Link>
       </div>

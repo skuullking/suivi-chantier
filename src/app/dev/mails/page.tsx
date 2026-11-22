@@ -11,10 +11,10 @@ export const metadata = { title: "Boîte mail de développement" };
 function Linkified({ text }: { text: string }) {
   const parts = text.split(/(https?:\/\/\S+)/g);
   return (
-    <p className="text-sm whitespace-pre-wrap text-stone-700">
+    <p className="text-ink-700 text-sm whitespace-pre-wrap">
       {parts.map((part, i) =>
         /^https?:\/\//.test(part) ? (
-          <a key={i} href={part} className="break-all text-orange-700 underline">
+          <a key={i} href={part} className="text-signal-700 break-all underline">
             {part}
           </a>
         ) : (

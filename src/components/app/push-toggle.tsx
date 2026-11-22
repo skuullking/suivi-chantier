@@ -79,7 +79,7 @@ export function PushToggle({ publicKey, className }: { publicKey: string; classN
       onClick={state === "on" ? disable : enable}
       className={cn(
         "flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl border-2 px-4 text-base font-bold disabled:opacity-60",
-        state === "on" ? "border-emerald-600 text-emerald-800" : "border-stone-800",
+        state === "on" ? "border-emerald-600 text-emerald-800" : "border-ink-800",
         className,
       )}
     >

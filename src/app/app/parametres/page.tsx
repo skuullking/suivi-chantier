@@ -83,14 +83,14 @@ export default async function SettingsPage() {
             <Link
               key={l.href}
               href={l.href}
-              className="flex items-center gap-3 rounded-xl border bg-white p-4 transition hover:border-orange-300"
+              className="hover:border-signal-300 flex items-center gap-3 rounded-xl border bg-white p-4 transition"
             >
-              <l.icon className="size-5 text-orange-700" aria-hidden />
+              <l.icon className="text-signal-700 size-5" aria-hidden />
               <span className="flex-1">
                 <span className="block font-medium">{l.label}</span>
                 <span className="text-muted-foreground text-sm">{l.description}</span>
               </span>
-              <ChevronRight className="size-4 text-stone-400" aria-hidden />
+              <ChevronRight className="text-ink-400 size-4" aria-hidden />
             </Link>
           ))}
           <Card>
@@ -102,7 +102,7 @@ export default async function SettingsPage() {
                 Transférez factures, devis et bons de commande à cette adresse : ils sont classés
                 automatiquement.
               </p>
-              <code className="rounded bg-stone-100 px-2 py-1 text-xs break-all">
+              <code className="bg-ink-100 rounded px-2 py-1 text-xs break-all">
                 {inboundAddress(org.slug)}
               </code>
             </CardContent>
@@ -112,16 +112,16 @@ export default async function SettingsPage() {
               <CardTitle>Exports</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-1 text-sm">
-              <a className="text-orange-700 hover:underline" href="/api/export/clients.csv">
+              <a className="text-signal-700 hover:underline" href="/api/export/clients.csv">
                 Clients (CSV)
               </a>
-              <a className="text-orange-700 hover:underline" href="/api/export/chantiers.csv">
+              <a className="text-signal-700 hover:underline" href="/api/export/chantiers.csv">
                 Chantiers (CSV)
               </a>
-              <a className="text-orange-700 hover:underline" href="/api/export/documents.csv">
+              <a className="text-signal-700 hover:underline" href="/api/export/documents.csv">
                 Documents (CSV)
               </a>
-              <a className="text-orange-700 hover:underline" href="/api/export/documents.zip">
+              <a className="text-signal-700 hover:underline" href="/api/export/documents.zip">
                 Tous les documents (ZIP)
               </a>
             </CardContent>

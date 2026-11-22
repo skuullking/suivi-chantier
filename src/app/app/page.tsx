@@ -1,5 +1,4 @@
 import {
-  AlertTriangle,
   CalendarDays,
   Camera,
   CheckCircle2,
@@ -13,10 +12,11 @@ import {
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/app/page-header";
-import { LateBadge, ProgressBar, SiteStatusBadge } from "@/components/app/status";
+import { LateBadge, ProgressBar, SiteStatusBadge, StepRibbon } from "@/components/app/status";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatRelative } from "@/lib/format";
+import { today } from "@/lib/dates";
+import { formatDayLong, formatRelative } from "@/lib/format";
 import { SLOT_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import { requireManager } from "@/server/auth/context";
@@ -24,6 +24,8 @@ import { dashboardData } from "@/server/services/dashboard";
 import { OnboardingActions } from "./dismiss-onboarding";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
+
+const plural = (n: number, word: string) => `${n} ${word}${n > 1 ? "s" : ""}`;
 
 export default async function DashboardPage() {
   const ctx = await requireManager();
@@ -43,46 +45,47 @@ export default async function DashboardPage() {
   const onboardingDone = onboardingSteps.filter((s) => s.done).length;
   const showOnboarding = !ctx.organization.onboardingDismissed && onboardingDone < onboardingSteps.length;
 
-  const alertCards = [
+  const toHandle = alerts.pendingPhotos + alerts.openInbox + alerts.draftSummaries;
+  const stats = [
     {
       key: "late",
       count: alerts.lateSites.length,
-      label: "chantier(s) en retard",
-      icon: AlertTriangle,
+      label: "En retard",
+      detail: alerts.lateSites[0]?.title ?? "Tout est dans les temps",
       href: "/app/chantiers",
-      tone: "text-red-700 bg-red-50 border-red-200",
+      danger: alerts.lateSites.length > 0,
     },
     {
       key: "photos",
       count: alerts.pendingPhotos,
-      label: "photo(s) à valider",
-      icon: Camera,
-      href: "/app/a-traiter",
-      tone: "text-orange-800 bg-orange-50 border-orange-200",
+      label: "Photos à valider",
+      detail: "Avant envoi au client",
     },
-    {
-      key: "inbox",
-      count: alerts.openInbox,
-      label: "élément(s) à classer",
-      icon: Inbox,
-      href: "/app/a-traiter",
-      tone: "text-sky-800 bg-sky-50 border-sky-200",
-    },
+    { key: "inbox", count: alerts.openInbox, label: "À classer", detail: "WhatsApp et e-mails" },
     {
       key: "summaries",
       count: alerts.draftSummaries,
-      label: "résumé(s) à approuver",
-      icon: Sparkles,
-      href: "/app/a-traiter",
-      tone: "text-violet-800 bg-violet-50 border-violet-200",
+      label: "Résumés à envoyer",
+      detail: "Le point du jour",
     },
   ];
 
   return (
     <>
       <PageHeader
+        eyebrow={formatDayLong(today(ctx.organizationTimeZone))}
         title={`Bonjour ${ctx.user.name.split(" ")[0]}`}
-        description={ctx.organization.name}
+        description={
+          <span className="font-heading text-ink-900 text-lg font-bold sm:text-xl">
+            {alerts.lateSites.length
+              ? `${plural(alerts.lateSites.length, "chantier")} en retard`
+              : "Aucun retard"}
+            ,{" "}
+            <span className={cn(toHandle > 0 && "bg-signal-400 rounded-md px-1.5")}>
+              {toHandle ? `${plural(toHandle, "chose")} à traiter` : "rien à traiter"}.
+            </span>
+          </span>
+        }
         actions={
           <>
             <Button asChild variant="outline">
@@ -100,10 +103,13 @@ export default async function DashboardPage() {
       />
 
       {showOnboarding ? (
-        <Card className="mb-6 border-orange-200 bg-orange-50/40" data-testid="onboarding">
+        <Card className="ring-ink-900 mb-6 ring-[1.5px]" data-testid="onboarding">
           <CardHeader className="flex flex-row items-center justify-between gap-2">
             <CardTitle>
-              Prise en main — {onboardingDone}/{onboardingSteps.length}
+              Prise en main{" "}
+              <span className="text-ink-600 font-mono text-sm">
+                {onboardingDone}/{onboardingSteps.length}
+              </span>
             </CardTitle>
             <OnboardingActions canDismiss={ctx.role === "OWNER"} />
           </CardHeader>
@@ -115,13 +121,13 @@ export default async function DashboardPage() {
             <ul className="grid gap-1 sm:grid-cols-2">
               {onboardingSteps.map((s) => (
                 <li key={s.label}>
-                  <Link href={s.href} className="flex items-center gap-2 text-sm hover:underline">
+                  <Link href={s.href} className="flex min-h-9 items-center gap-2 text-sm hover:underline">
                     {s.done ? (
-                      <CheckCircle2 className="size-4 text-emerald-600" aria-label="Fait" />
+                      <CheckCircle2 className="size-4 text-emerald-700" aria-label="Fait" />
                     ) : (
-                      <Circle className="size-4 text-stone-400" aria-label="À faire" />
+                      <Circle className="text-ink-400 size-4" aria-label="À faire" />
                     )}
-                    <span className={s.done ? "text-stone-500 line-through" : ""}>{s.label}</span>
+                    <span className={s.done ? "text-ink-500 line-through" : ""}>{s.label}</span>
                   </Link>
                 </li>
               ))}
@@ -130,34 +136,45 @@ export default async function DashboardPage() {
         </Card>
       ) : null}
 
-      <section aria-label="Alertes" className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {alertCards.map((a) => (
+      <section
+        aria-label="Chiffres clés"
+        className="border-ink-200 mb-8 grid grid-cols-2 overflow-hidden rounded-[14px] border bg-white lg:grid-cols-4"
+      >
+        {stats.map((a, i) => (
           <Link
             key={a.key}
-            href={a.href}
+            href={a.href ?? "/app/a-traiter"}
             data-testid={`alert-${a.key}`}
             className={cn(
-              "flex items-center gap-3 rounded-xl border p-4 transition hover:shadow-sm",
-              a.count ? a.tone : "border-stone-200 bg-white text-stone-500",
+              "border-ink-200 hover:bg-ink-50 flex min-w-0 flex-col gap-1.5 p-5 transition-colors",
+              i % 2 === 0 && "border-r",
+              i < 2 && "border-b lg:border-b-0",
+              i === 1 && "lg:border-r",
+              i === 2 && "lg:border-r",
             )}
           >
-            <a.icon className="size-6 shrink-0" aria-hidden />
-            <span>
-              <span className="block text-2xl font-bold tabular-nums">{a.count}</span>
-              <span className="text-sm">{a.label}</span>
+            <span className={cn("label-mono", a.danger ? "text-red-700" : "text-ink-600")}>{a.label}</span>
+            <span
+              className={cn(
+                "font-heading text-[2.6rem] leading-none font-extrabold tabular-nums",
+                a.danger && "text-red-700",
+              )}
+            >
+              {a.count}
             </span>
+            <span className="text-ink-600 truncate text-[13px]">{a.detail}</span>
           </Link>
         ))}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section className="grid min-w-0 content-start gap-3 lg:col-span-2" aria-labelledby="sites-title">
-          <div className="flex items-center justify-between">
-            <h2 id="sites-title" className="text-lg font-semibold">
+      <div className="grid gap-7 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <section className="grid min-w-0 content-start gap-3" aria-labelledby="sites-title">
+          <div className="flex items-baseline justify-between">
+            <h2 id="sites-title" className="text-2xl font-extrabold">
               Chantiers en cours
             </h2>
-            <Link href="/app/chantiers" className="text-sm text-orange-700 hover:underline">
-              Tous les chantiers
+            <Link href="/app/chantiers" className="text-sm font-semibold hover:underline">
+              Tous les chantiers →
             </Link>
           </div>
           {data.sites.length === 0 ? (
@@ -172,42 +189,100 @@ export default async function DashboardPage() {
               }
             />
           ) : (
-            <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
-              {data.sites.map((s) => (
-                <Link
-                  key={s.id}
-                  href={`/app/chantiers/${s.id}`}
-                  className="grid min-w-0 gap-2 rounded-xl border bg-white p-4 transition hover:border-orange-300 hover:shadow-sm"
-                  data-testid="dashboard-site"
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{s.title}</p>
-                      <p className="text-muted-foreground truncate text-sm">{s.client.name}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      <SiteStatusBadge status={s.status} />
-                      {s.lateness.late ? <LateBadge /> : null}
-                    </div>
+            data.sites.map((s) => (
+              <Link
+                key={s.id}
+                href={`/app/chantiers/${s.id}`}
+                className="border-ink-200 hover:border-ink-900 grid min-w-0 gap-4 rounded-[14px] border bg-white p-5 transition-colors"
+                data-testid="dashboard-site"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="label-mono text-ink-600">
+                      {s.code}
+                      {s.city ? ` · ${s.city}` : ""}
+                    </p>
+                    <p className="font-heading mt-1 truncate text-xl font-bold tracking-tight">{s.title}</p>
+                    <p className="text-ink-600 truncate text-sm">{s.client.name}</p>
                   </div>
-                  <ProgressBar value={s.progress} label={`Progression de ${s.title}`} />
-                  <p className="text-muted-foreground truncate text-xs">
-                    {s.next ? `Prochaine étape : ${s.next.title}` : "Toutes les étapes sont terminées"}
-                  </p>
-                </Link>
-              ))}
-            </div>
+                  {s.lateness.late ? <LateBadge /> : <SiteStatusBadge status={s.status} />}
+                </div>
+                <div className="flex items-center gap-4">
+                  <StepRibbon steps={s.steps} className="flex-1" />
+                  <span className="font-mono text-sm font-bold tabular-nums">
+                    {Math.round(s.progress)} %<span className="sr-only"> d&apos;avancement</span>
+                  </span>
+                </div>
+                <div className="text-ink-600 flex flex-wrap justify-between gap-2 text-sm">
+                  <span className="truncate">
+                    {s.next ? (
+                      <>
+                        Prochaine étape : <strong className="text-ink-900">{s.next.title}</strong>
+                      </>
+                    ) : (
+                      "Toutes les étapes sont terminées"
+                    )}
+                  </span>
+                  {s.members.length ? (
+                    <span className="truncate">
+                      {s.members.map((m) => m.user.name.split(" ")[0]).join(", ")}
+                    </span>
+                  ) : null}
+                </div>
+              </Link>
+            ))
           )}
         </section>
 
-        <div className="grid content-start gap-6">
+        <div className="grid content-start gap-5">
+          <section
+            className="bg-ink-900 grid gap-3 rounded-[14px] p-5 text-white"
+            aria-labelledby="todo-title"
+          >
+            <div className="flex items-center justify-between">
+              <h2 id="todo-title" className="text-[1.35rem] font-extrabold">
+                À traiter
+              </h2>
+              <span className="bg-signal-400 text-ink-900 rounded-md px-2 py-0.5 font-mono text-xs font-bold">
+                {toHandle}
+              </span>
+            </div>
+            {toHandle === 0 ? (
+              <p className="text-ink-300 text-sm">Tout est rangé. Rien n&apos;attend votre validation.</p>
+            ) : (
+              <ul className="grid text-sm">
+                {alerts.pendingPhotos ? (
+                  <li className="border-ink-800 flex items-center gap-3 border-t py-2.5">
+                    <Camera className="text-signal-400 size-4" aria-hidden />
+                    {plural(alerts.pendingPhotos, "photo")} à valider
+                  </li>
+                ) : null}
+                {alerts.openInbox ? (
+                  <li className="border-ink-800 flex items-center gap-3 border-t py-2.5">
+                    <Inbox className="text-signal-400 size-4" aria-hidden />
+                    {plural(alerts.openInbox, "élément")} à classer
+                  </li>
+                ) : null}
+                {alerts.draftSummaries ? (
+                  <li className="border-ink-800 flex items-center gap-3 border-t py-2.5">
+                    <Sparkles className="text-signal-400 size-4" aria-hidden />
+                    {plural(alerts.draftSummaries, "résumé")} à envoyer
+                  </li>
+                ) : null}
+              </ul>
+            )}
+            <Button asChild className="h-11 border-0">
+              <Link href="/app/a-traiter">Tout traiter</Link>
+            </Button>
+          </section>
+
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <CalendarDays className="size-4" aria-hidden /> Aujourd&apos;hui
+                <CalendarDays className="size-4" aria-hidden /> Sur le terrain aujourd&apos;hui
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid gap-2 text-sm">
+            <CardContent className="grid gap-1 text-sm">
               {data.todayAssignments.length === 0 ? (
                 <p className="text-muted-foreground">Personne n&apos;est planifié aujourd&apos;hui.</p>
               ) : (
@@ -215,45 +290,51 @@ export default async function DashboardPage() {
                   <Link
                     key={a.id}
                     href={`/app/chantiers/${a.site.id}`}
-                    className="flex justify-between gap-2 hover:underline"
+                    className="flex min-h-10 items-center justify-between gap-2 hover:underline"
                   >
-                    <span>
-                      <strong>{a.user.name.split(" ")[0]}</strong> — {a.site.title}
+                    <span className="truncate">
+                      <strong>{a.user.name.split(" ")[0]}</strong> · {a.site.title}
                     </span>
-                    <span className="text-muted-foreground shrink-0">
-                      {a.startTime ?? SLOT_LABELS[a.slot].toLowerCase()}
-                      {a.arrivedAt ? " ✔" : ""}
+                    <span
+                      className={cn(
+                        "shrink-0 font-mono text-xs font-bold uppercase",
+                        a.arrivedAt ? "text-emerald-700" : "text-ink-600",
+                      )}
+                    >
+                      {a.arrivedAt ? "● Sur place" : (a.startTime ?? SLOT_LABELS[a.slot])}
                     </span>
                   </Link>
                 ))
               )}
             </CardContent>
           </Card>
-          <Card>
-            <CardHeader>
-              <CardTitle>Activité récente</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ol className="grid gap-3 text-sm">
-                {data.activity.length === 0 ? (
-                  <p className="text-muted-foreground">Rien pour l&apos;instant.</p>
-                ) : null}
-                {data.activity.map((e) => (
-                  <li key={e.id}>
-                    <p>
-                      <strong>{e.actor}</strong> {e.text}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      <Link href={`/app/chantiers/${e.site.id}`} className="hover:underline">
-                        {e.site.title}
-                      </Link>{" "}
-                      · {formatRelative(e.createdAt)}
-                    </p>
-                  </li>
-                ))}
-              </ol>
-            </CardContent>
-          </Card>
+
+          <section aria-labelledby="activity-title" className="px-1">
+            <h2 id="activity-title" className="label-mono text-ink-600 mb-2">
+              Fil d&apos;activité
+            </h2>
+            {data.activity.length === 0 ? (
+              <p className="text-muted-foreground text-sm">Rien pour l&apos;instant.</p>
+            ) : null}
+            <ol className="text-sm">
+              {data.activity.map((e) => (
+                <li key={e.id} className="border-ink-200 grid grid-cols-[84px_1fr] gap-2 border-t py-2.5">
+                  <span className="text-ink-600 font-mono text-[11px] leading-5 uppercase">
+                    {formatRelative(e.createdAt)}
+                  </span>
+                  <span className="min-w-0">
+                    <strong>{e.actor}</strong> {e.text}
+                    <Link
+                      href={`/app/chantiers/${e.site.id}`}
+                      className="text-ink-600 block truncate text-xs hover:underline"
+                    >
+                      {e.site.title}
+                    </Link>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </section>
         </div>
       </div>
     </>

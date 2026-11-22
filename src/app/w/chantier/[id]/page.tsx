@@ -32,9 +32,9 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
     <div className="grid gap-4">
       <section className="grid gap-3 rounded-2xl bg-white p-4 shadow-sm">
         <div>
-          <p className="font-mono text-sm text-stone-500">{site.code}</p>
+          <p className="text-ink-500 font-mono text-sm">{site.code}</p>
           <h1 className="text-2xl font-bold">{site.title}</h1>
-          <p className="text-stone-600">
+          <p className="text-ink-600">
             {site.address}
             {site.city ? `, ${site.city}` : ""}
           </p>
@@ -44,7 +44,7 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
             href={urls.google}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-h-14 items-center justify-center rounded-xl border-2 border-stone-800 font-bold"
+            className="border-ink-800 flex min-h-14 items-center justify-center rounded-xl border-2 font-bold"
           >
             Y aller (Maps)
           </a>
@@ -52,7 +52,7 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
             href={urls.waze}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex min-h-14 items-center justify-center rounded-xl border-2 border-stone-800 font-bold"
+            className="border-ink-800 flex min-h-14 items-center justify-center rounded-xl border-2 font-bold"
           >
             Waze
           </a>
@@ -60,13 +60,13 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
         {site.client.phones[0] ? (
           <a
             href={`tel:${site.client.phones[0].replace(/\s/g, "")}`}
-            className="font-semibold text-orange-700 underline"
+            className="text-signal-700 font-semibold underline"
           >
             Appeler le client ({site.client.name})
           </a>
         ) : null}
         {site.instructions ? (
-          <div className="flex gap-2 rounded-xl bg-amber-50 p-3 text-amber-950">
+          <div className="bg-signal-50 text-ink-900 flex gap-2 rounded-xl p-3">
             <Info className="mt-0.5 size-5 shrink-0" aria-hidden />
             <p className="whitespace-pre-wrap">{site.instructions}</p>
           </div>
@@ -84,7 +84,7 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
         <ol className="grid gap-2">
           {site.steps.map((s) => (
             <li key={s.id} className="flex items-center justify-between gap-2 border-b pb-2 last:border-0">
-              <span className={s.status === "DONE" ? "text-stone-400 line-through" : "font-medium"}>
+              <span className={s.status === "DONE" ? "text-ink-400 line-through" : "font-medium"}>
                 {s.title}
               </span>
               <StepStatusBadge status={s.status} />
@@ -115,7 +115,7 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
               rel="noopener noreferrer"
               className="flex min-h-12 items-center gap-2 rounded-xl border px-3 font-medium"
             >
-              <FileText className="size-5 text-stone-500" aria-hidden /> {p.name}
+              <FileText className="text-ink-500 size-5" aria-hidden /> {p.name}
             </a>
           ))}
         </section>
@@ -124,13 +124,13 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
       <section className="grid gap-2 rounded-2xl bg-white p-4 shadow-sm">
         <h2 className="text-lg font-bold">Mes envois</h2>
         {myMedia.length === 0 ? (
-          <p className="text-stone-600">Rien envoyé sur ce chantier pour l&apos;instant.</p>
+          <p className="text-ink-600">Rien envoyé sur ce chantier pour l&apos;instant.</p>
         ) : null}
         <ul className="grid grid-cols-3 gap-2">
           {myMedia.map((m) => {
             const u = m.kind === "PHOTO" && m.thumbnailKey ? mediaUrls(m) : null;
             return (
-              <li key={m.id} className="relative aspect-square overflow-hidden rounded-lg bg-stone-100">
+              <li key={m.id} className="bg-ink-100 relative aspect-square overflow-hidden rounded-lg">
                 {u?.thumbnail ? (
                   // eslint-disable-next-line @next/next/no-img-element -- signed private URL
                   <img
@@ -139,7 +139,7 @@ export default async function WorkerSitePage({ params }: { params: Promise<{ id:
                     className="size-full object-cover"
                   />
                 ) : (
-                  <div className="flex size-full flex-col items-center justify-center text-xs text-stone-500">
+                  <div className="text-ink-500 flex size-full flex-col items-center justify-center text-xs">
                     <Mic className="size-6" aria-hidden />
                     {m.kind === "VOICE" ? "Vocal" : "Traitement…"}
                   </div>

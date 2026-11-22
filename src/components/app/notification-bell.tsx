@@ -29,14 +29,14 @@ export function NotificationBell({ items, unread }: { items: BellNotification[];
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          variant="ghost"
+          variant="outline"
           size="icon"
           className="relative"
           aria-label={unread ? `Notifications (${unread} non lues)` : "Notifications"}
         >
           <Bell className="size-5" aria-hidden />
           {unread > 0 ? (
-            <span className="absolute top-1 right-1 flex min-w-4 items-center justify-center rounded-full bg-orange-600 px-1 text-[10px] font-bold text-white">
+            <span className="bg-signal-400 text-ink-900 border-ink-900 absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-md border-[1.5px] px-1 font-mono text-[10px] font-bold">
               {unread > 9 ? "9+" : unread}
             </span>
           ) : null}
@@ -49,7 +49,7 @@ export function NotificationBell({ items, unread }: { items: BellNotification[];
             <button
               type="button"
               disabled={pending}
-              className="text-xs font-normal text-orange-700 hover:underline"
+              className="text-ink-900 text-xs font-normal underline"
               onClick={() => startTransition(async () => void (await markNotificationsReadAction()))}
             >
               Tout marquer comme lu
@@ -69,7 +69,7 @@ export function NotificationBell({ items, unread }: { items: BellNotification[];
                   if (!n.read) startTransition(async () => void (await markNotificationsReadAction([n.id])));
                 }}
               >
-                <span className={n.read ? "text-stone-600" : "font-semibold"}>{n.title}</span>
+                <span className={n.read ? "text-ink-600" : "font-semibold"}>{n.title}</span>
                 {n.body ? <span className="text-muted-foreground line-clamp-2 text-xs">{n.body}</span> : null}
                 <span className="text-muted-foreground text-[11px]">{n.createdAt}</span>
               </Link>

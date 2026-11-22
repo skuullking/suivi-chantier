@@ -97,7 +97,7 @@ export default async function ClientsPage({
       ) : (
         <div className="overflow-x-auto rounded-xl border bg-white">
           <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-left text-xs text-stone-600 uppercase">
+            <thead className="bg-ink-50 text-ink-600 text-left text-xs uppercase">
               <tr>
                 <th className="px-4 py-3 font-medium">Client</th>
                 <th className="hidden px-4 py-3 font-medium md:table-cell">Contact</th>
@@ -107,12 +107,9 @@ export default async function ClientsPage({
             </thead>
             <tbody className="divide-y">
               {clients.map((c) => (
-                <tr key={c.id} className="hover:bg-stone-50" data-testid="client-row">
+                <tr key={c.id} className="hover:bg-ink-50" data-testid="client-row">
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/app/clients/${c.id}`}
-                      className="font-medium text-stone-900 hover:underline"
-                    >
+                    <Link href={`/app/clients/${c.id}`} className="text-ink-900 font-medium hover:underline">
                       {c.name}
                     </Link>
                     <p className="text-muted-foreground text-xs">
@@ -121,7 +118,7 @@ export default async function ClientsPage({
                       {c.tags.length ? ` · ${c.tags.join(", ")}` : ""}
                     </p>
                   </td>
-                  <td className="hidden px-4 py-3 text-stone-700 md:table-cell">
+                  <td className="text-ink-700 hidden px-4 py-3 md:table-cell">
                     <p>{c.phones[0] ?? "—"}</p>
                     <p className="text-muted-foreground text-xs">{c.emails[0] ?? ""}</p>
                   </td>

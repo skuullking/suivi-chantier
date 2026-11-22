@@ -76,13 +76,13 @@ export default async function DocumentsPage({ searchParams }: { searchParams: Pr
         <Card>
           <CardContent className="grid gap-2 pt-6 text-sm">
             <p className="flex items-center gap-2 font-semibold">
-              <Mail className="size-4 text-orange-700" aria-hidden /> Transférez vos factures par e-mail
+              <Mail className="text-signal-700 size-4" aria-hidden /> Transférez vos factures par e-mail
             </p>
             <p className="text-muted-foreground">
               Chaque e-mail envoyé ou transféré à cette adresse est rangé automatiquement (type, fournisseur,
               montant, chantier) :
             </p>
-            <code className="rounded bg-stone-100 px-2 py-1 text-xs break-all" data-testid="inbound-address">
+            <code className="bg-ink-100 rounded px-2 py-1 text-xs break-all" data-testid="inbound-address">
               {inbox}
             </code>
           </CardContent>

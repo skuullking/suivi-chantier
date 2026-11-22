@@ -1,4 +1,4 @@
-import { AppSidebar, MobileNav } from "@/components/app/app-nav";
+import { AppSidebar, ManagerTabBar, MobileNav } from "@/components/app/app-nav";
 import { CommandPalette } from "@/components/app/command-palette";
 import { NotificationBell } from "@/components/app/notification-bell";
 import { UserMenu } from "@/components/app/user-menu";
@@ -22,10 +22,10 @@ export default async function BackOfficeLayout({ children }: { children: React.R
   const toSort = inboxCount + pendingPhotos;
 
   return (
-    <div className="flex min-h-screen bg-stone-50">
+    <div className="bg-background flex min-h-screen">
       <AppSidebar organizationName={ctx.organization.name} isOwner={isOwner} inboxCount={toSort} />
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-30 flex h-14 items-center gap-2 border-b bg-white/90 px-4 backdrop-blur">
+        <header className="bg-background/95 border-ink-200 sticky top-0 z-30 flex h-[68px] items-center gap-2 border-b px-4 backdrop-blur sm:px-8">
           <MobileNav organizationName={ctx.organization.name} isOwner={isOwner} inboxCount={toSort} />
           <div className="flex flex-1 items-center">
             <CommandPalette />
@@ -43,10 +43,11 @@ export default async function BackOfficeLayout({ children }: { children: React.R
           />
           <UserMenu name={ctx.user.name} email={ctx.user.email} roleLabel={ROLE_LABELS[ctx.role]} />
         </header>
-        <main id="contenu" className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6">
+        <main id="contenu" className="w-full max-w-[1240px] flex-1 px-4 pt-7 pb-28 sm:px-8 lg:pb-12">
           {children}
         </main>
       </div>
+      <ManagerTabBar inboxCount={toSort} />
     </div>
   );
 }

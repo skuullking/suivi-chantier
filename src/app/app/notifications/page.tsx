@@ -21,7 +21,7 @@ export default async function NotificationsPage() {
       ) : (
         <ul className="divide-y rounded-xl border bg-white">
           {items.map((n) => (
-            <li key={n.id} className={cn("px-4 py-3", !n.readAt && "bg-orange-50/40")}>
+            <li key={n.id} className={cn("px-4 py-3", !n.readAt && "bg-signal-50/40")}>
               <Link href={n.link ?? "#"} className="block hover:underline">
                 <p className={n.readAt ? "" : "font-semibold"}>{n.title}</p>
                 {n.body ? <p className="text-muted-foreground text-sm">{n.body}</p> : null}

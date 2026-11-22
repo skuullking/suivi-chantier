@@ -64,7 +64,7 @@ export default async function SitePhotosPage({
               aria-current={(status ?? "") === f.key ? "true" : undefined}
               className={cn(
                 "rounded-md px-3 py-1 text-sm",
-                (status ?? "") === f.key ? "bg-stone-100 font-semibold" : "text-stone-600",
+                (status ?? "") === f.key ? "bg-ink-100 font-semibold" : "text-ink-600",
               )}
             >
               {f.label}
@@ -74,13 +74,13 @@ export default async function SitePhotosPage({
         <nav className="flex rounded-lg border bg-white p-0.5" aria-label="Regrouper">
           <Link
             href={href({ vue: "etape" })}
-            className={cn("rounded-md px-3 py-1 text-sm", byStep && "bg-stone-100 font-semibold")}
+            className={cn("rounded-md px-3 py-1 text-sm", byStep && "bg-ink-100 font-semibold")}
           >
             Par étape
           </Link>
           <Link
             href={href({ vue: "date" })}
-            className={cn("rounded-md px-3 py-1 text-sm", !byStep && "bg-stone-100 font-semibold")}
+            className={cn("rounded-md px-3 py-1 text-sm", !byStep && "bg-ink-100 font-semibold")}
           >
             Par date
           </Link>
@@ -115,12 +115,12 @@ export default async function SitePhotosPage({
                 className="grid gap-2 rounded-xl border bg-white p-3 sm:grid-cols-[auto_1fr] sm:items-center"
               >
                 <span className="flex items-center gap-2 text-sm">
-                  <Mic className="size-4 text-sky-700" aria-hidden />
+                  <Mic className="text-ink-800 size-4" aria-hidden />
                   {v.author?.name ?? "—"} · {formatDateTime(v.capturedAt ?? v.receivedAt)}
                 </span>
                 <audio controls preload="none" src={mediaUrls(v).display} className="w-full" />
                 {v.transcription ? (
-                  <p className="text-sm text-stone-700 sm:col-span-2">« {v.transcription} »</p>
+                  <p className="text-ink-700 text-sm sm:col-span-2">« {v.transcription} »</p>
                 ) : null}
               </li>
             ))}

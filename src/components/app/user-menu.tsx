@@ -29,7 +29,7 @@ export function UserMenu({ name, email, roleLabel }: { name: string; email: stri
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="h-10 gap-2 px-2" aria-label="Menu du compte">
           <Avatar className="size-8">
-            <AvatarFallback className="bg-orange-100 text-orange-800">{initials(name)}</AvatarFallback>
+            <AvatarFallback className="bg-signal-100 text-signal-800">{initials(name)}</AvatarFallback>
           </Avatar>
           <span className="hidden text-sm font-medium sm:inline">{name}</span>
         </Button>

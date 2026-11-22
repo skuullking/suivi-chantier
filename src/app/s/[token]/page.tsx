@@ -5,6 +5,7 @@ import { LogoMark } from "@/components/brand/logo";
 import { formatDateTime, formatDay, formatDayLong } from "@/lib/format";
 import { DOCUMENT_TYPE_LABELS, SLOT_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
+import { StepRibbon } from "@/components/app/status";
 import { db } from "@/server/db";
 import { consumeRateLimit } from "@/server/security/rate-limit";
 import { clientIpFromHeaders } from "@/server/security/request";
@@ -24,8 +25,8 @@ function waLink(phone: string) {
 
 function Shell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-dvh bg-stone-100">
-      <div className="mx-auto max-w-2xl px-4 pt-6 pb-16">{children}</div>
+    <div className="bg-background min-h-dvh">
+      <div className="mx-auto max-w-2xl px-4 pt-0 pb-16 sm:pt-6">{children}</div>
     </div>
   );
 }
@@ -39,22 +40,25 @@ async function ExpiredPage({ organizationId }: { organizationId: string | null }
     : null;
   return (
     <Shell>
-      <div className="rounded-2xl bg-white p-6 text-center shadow-sm" data-testid="portal-expired">
+      <div
+        className="border-ink-200 rounded-2xl border bg-white p-6 text-center"
+        data-testid="portal-expired"
+      >
         <LogoMark className="mx-auto mb-4 size-10" />
         <h1 className="text-2xl font-bold">Ce lien n&apos;est plus valide</h1>
-        <p className="mt-2 text-stone-600">
+        <p className="text-ink-600 mt-2">
           Le lien de suivi a expiré ou a été remplacé. Demandez un nouveau lien à votre artisan.
         </p>
         {org ? (
-          <div className="mt-4 grid gap-1 text-stone-700">
+          <div className="text-ink-700 mt-4 grid gap-1">
             <p className="font-semibold">{org.name}</p>
             {org.phone ? (
-              <a href={`tel:${org.phone}`} className="text-orange-700 underline">
+              <a href={`tel:${org.phone}`} className="font-semibold underline">
                 {org.phone}
               </a>
             ) : null}
             {org.email ? (
-              <a href={`mailto:${org.email}`} className="text-orange-700 underline">
+              <a href={`mailto:${org.email}`} className="font-semibold underline">
                 {org.email}
               </a>
             ) : null}
@@ -72,7 +76,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
   if (!limit.allowed) {
     return (
       <Shell>
-        <p className="rounded-2xl bg-white p-6 text-center shadow-sm">
+        <p className="border-ink-200 rounded-2xl border bg-white p-6 text-center">
           Trop de consultations en peu de temps. Réessayez dans quelques minutes.
         </p>
       </Shell>
@@ -106,48 +110,56 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
 
   return (
     <Shell>
-      <header className="mb-5 flex items-center gap-3">
-        <LogoMark className="size-10 shrink-0" />
-        <div className="min-w-0">
-          <p className="text-sm font-semibold text-orange-700">{org.name}</p>
-          <h1 className="text-2xl leading-tight font-bold">{site.title}</h1>
-          <p className="truncate text-sm text-stone-600">{site.address}</p>
+      <header className="bg-ink-900 -mx-4 mb-4 grid gap-4 px-5 pt-6 pb-6 text-white sm:mx-0 sm:rounded-2xl">
+        <div className="flex items-center gap-3">
+          <LogoMark className="size-9 shrink-0" />
+          <p className="label-mono text-ink-300 min-w-0 truncate">{org.name}</p>
         </div>
-      </header>
-
-      <section className="mb-4 rounded-2xl bg-white p-5 shadow-sm" aria-labelledby="avancement">
-        <div className="flex items-end justify-between">
-          <h2 id="avancement" className="text-lg font-bold">
-            Avancement
-          </h2>
-          <span className="text-3xl font-extrabold text-orange-700" data-testid="portal-progress">
+        <div>
+          <h1 className="text-[2rem] leading-none font-extrabold">{site.title}</h1>
+          <p className="text-ink-300 mt-2 truncate text-sm">{site.address}</p>
+        </div>
+        <div className="flex items-end justify-between gap-3">
+          <span
+            className="font-heading text-signal-400 text-[4.5rem] leading-[0.85] font-extrabold tracking-[-0.05em]"
+            data-testid="portal-progress"
+          >
             {site.progress} %
+          </span>
+          <span className="text-ink-200 pb-1 text-right text-sm">
+            {doneCount} étape{doneCount > 1 ? "s" : ""} sur {data.steps.length}
+            {site.plannedEnd ? (
+              <>
+                <br />
+                fin prévue le {formatDay(site.plannedEnd)}
+              </>
+            ) : null}
           </span>
         </div>
         <div
-          className="mt-2 h-3 overflow-hidden rounded-full bg-stone-200"
           role="progressbar"
           aria-valuenow={site.progress}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-label="Avancement du chantier"
         >
-          <div className="h-full rounded-full bg-orange-600" style={{ width: `${site.progress}%` }} />
+          <StepRibbon steps={data.steps} size="sm" tone="dark" />
         </div>
-        <p className="mt-2 text-sm text-stone-600">
-          {doneCount} étape{doneCount > 1 ? "s" : ""} terminée{doneCount > 1 ? "s" : ""} sur{" "}
-          {data.steps.length}
-          {site.plannedEnd ? ` · fin prévue le ${formatDay(site.plannedEnd)}` : ""}
-        </p>
+      </header>
+
+      <section className="border-ink-200 mb-4 rounded-2xl border bg-white p-5" aria-labelledby="avancement">
+        <h2 id="avancement" className="text-xl font-extrabold">
+          Les étapes
+        </h2>
         <ol className="mt-4 grid gap-2">
           {data.steps.map((s) => (
             <li key={s.id} className="flex items-center gap-3">
               <span
                 className={cn(
-                  "flex size-7 shrink-0 items-center justify-center rounded-full",
-                  s.status === "DONE" && "bg-emerald-600 text-white",
-                  s.status === "IN_PROGRESS" && "bg-orange-600 text-white",
-                  s.status === "TODO" && "border-2 border-stone-300 text-stone-300",
+                  "flex size-7 shrink-0 items-center justify-center rounded-lg",
+                  s.status === "DONE" && "bg-ink-900 text-white",
+                  s.status === "IN_PROGRESS" && "bg-signal-400 border-ink-900 text-ink-900 border-[1.5px]",
+                  s.status === "TODO" && "border-ink-300 text-ink-300 border-2",
                 )}
                 aria-hidden
               >
@@ -159,8 +171,8 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
                   <Circle className="size-3" />
                 )}
               </span>
-              <span className={cn(s.status === "TODO" ? "text-stone-500" : "font-medium")}>{s.title}</span>
-              <span className="ml-auto text-xs text-stone-500">
+              <span className={cn(s.status === "TODO" ? "text-ink-500" : "font-medium")}>{s.title}</span>
+              <span className="label-mono text-ink-600 ml-auto">
                 {s.status === "DONE" ? "Terminée" : s.status === "IN_PROGRESS" ? "En cours" : "À venir"}
               </span>
             </li>
@@ -169,9 +181,12 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
       </section>
 
       {data.upcoming.length ? (
-        <section className="mb-4 rounded-2xl bg-white p-5 shadow-sm" aria-labelledby="interventions">
+        <section
+          className="border-ink-200 mb-4 rounded-2xl border bg-white p-5"
+          aria-labelledby="interventions"
+        >
           <h2 id="interventions" className="mb-3 flex items-center gap-2 text-lg font-bold">
-            <CalendarDays className="size-5 text-orange-700" aria-hidden /> Prochaines interventions
+            <CalendarDays className="size-5" aria-hidden /> Prochaines interventions
           </h2>
           <ul className="grid gap-2">
             {data.upcoming.slice(0, 6).map((u) => (
@@ -180,7 +195,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
                 className="flex justify-between gap-2 border-b pb-2 last:border-0"
               >
                 <span className="font-medium capitalize">{formatDayLong(u.date)}</span>
-                <span className="text-right text-sm text-stone-600">
+                <span className="text-ink-600 text-right text-sm">
                   {u.fullDay ? "Journée" : SLOT_LABELS[u.slot as keyof typeof SLOT_LABELS]}
                   {u.startTime ? ` dès ${u.startTime.replace(":", " h ")}` : ""}
                   <br />
@@ -197,14 +212,18 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
           Fil d&apos;actualité
         </h2>
         {feed.length === 0 ? (
-          <p className="rounded-2xl bg-white p-5 text-stone-600 shadow-sm">
+          <p className="text-ink-600 rounded-2xl bg-white p-5 shadow-sm">
             Les nouvelles du chantier arriveront ici.
           </p>
         ) : (
           feed.map((d) => (
-            <article key={d.key} className="rounded-2xl bg-white p-5 shadow-sm" data-testid="portal-day">
+            <article
+              key={d.key}
+              className="border-ink-200 rounded-2xl border bg-white p-5"
+              data-testid="portal-day"
+            >
               <h3 className="font-semibold capitalize">{formatDayLong(new Date(`${d.key}T00:00:00Z`))}</h3>
-              {d.summary ? <p className="mt-2 whitespace-pre-wrap text-stone-800">{d.summary}</p> : null}
+              {d.summary ? <p className="text-ink-800 mt-2 whitespace-pre-wrap">{d.summary}</p> : null}
               {d.photos.length ? (
                 <PhotoFeed
                   photos={d.photos.map((p) => ({
@@ -222,7 +241,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
       </section>
 
       {data.documents.length ? (
-        <section className="mb-4 rounded-2xl bg-white p-5 shadow-sm" aria-labelledby="documents">
+        <section className="border-ink-200 mb-4 rounded-2xl border bg-white p-5" aria-labelledby="documents">
           <h2 id="documents" className="mb-3 text-lg font-bold">
             Documents
           </h2>
@@ -231,11 +250,11 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
               <li key={d.id}>
                 <a
                   href={d.url}
-                  className="flex min-h-12 items-center gap-3 rounded-xl border px-3 hover:bg-stone-50"
+                  className="hover:bg-ink-50 flex min-h-12 items-center gap-3 rounded-xl border px-3"
                 >
-                  <Download className="size-5 text-orange-700" aria-hidden />
+                  <Download className="size-5" aria-hidden />
                   <span className="flex-1">{d.name}</span>
-                  <span className="text-xs text-stone-500">{DOCUMENT_TYPE_LABELS[d.type]}</span>
+                  <span className="text-ink-500 text-xs">{DOCUMENT_TYPE_LABELS[d.type]}</span>
                 </a>
               </li>
             ))}
@@ -243,7 +262,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
         </section>
       ) : null}
 
-      <section className="rounded-2xl bg-white p-5 shadow-sm" aria-labelledby="contact">
+      <section className="border-ink-200 rounded-2xl border bg-white p-5" aria-labelledby="contact">
         <h2 id="contact" className="mb-3 text-lg font-bold">
           Contacter {org.name}
         </h2>
@@ -251,7 +270,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
           {org.phone ? (
             <a
               href={`tel:${org.phone}`}
-              className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-700 font-semibold text-white"
+              className="bg-ink-900 flex min-h-12 items-center justify-center gap-2 rounded-xl font-semibold text-white"
             >
               <Phone className="size-5" aria-hidden /> Appeler
             </a>
@@ -261,7 +280,7 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
               href={waLink(org.phone)}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 font-semibold text-emerald-800"
+              className="border-ink-900 flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 font-semibold"
             >
               <MessageCircle className="size-5" aria-hidden /> WhatsApp
             </a>
@@ -269,14 +288,14 @@ export default async function ClientPortalPage({ params }: { params: Promise<{ t
           {org.email ? (
             <a
               href={`mailto:${org.email}`}
-              className="flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 border-stone-800 font-semibold"
+              className="border-ink-800 flex min-h-12 items-center justify-center gap-2 rounded-xl border-2 font-semibold"
             >
               <Mail className="size-5" aria-hidden /> E-mail
             </a>
           ) : null}
         </div>
       </section>
-      <p className="mt-6 text-center text-xs text-stone-500">
+      <p className="label-mono text-ink-600 mt-6 text-center">
         Espace de suivi fourni par {org.name} avec ChantierLink. Ce lien est personnel.
       </p>
     </Shell>

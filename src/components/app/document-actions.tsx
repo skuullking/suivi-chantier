@@ -86,11 +86,7 @@ export function DocumentActions({
               )
             }
           >
-            {doc.visibleToClient ? (
-              <Eye className="text-emerald-700" />
-            ) : (
-              <EyeOff className="text-stone-400" />
-            )}
+            {doc.visibleToClient ? <Eye className="text-emerald-700" /> : <EyeOff className="text-ink-400" />}
           </Button>
           <EditDocumentDialog doc={doc} sites={sites} clients={clients} />
           <ConfirmButton

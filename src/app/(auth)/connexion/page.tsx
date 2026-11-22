@@ -18,7 +18,7 @@ export default async function SignInPage({
   return (
     <Card>
       <CardHeader>
-        <CardTitle as="h1" className="text-xl">
+        <CardTitle as="h1" className="text-3xl">
           Connexion
         </CardTitle>
         <CardDescription>Accédez à vos chantiers.</CardDescription>
@@ -31,7 +31,7 @@ export default async function SignInPage({
           </Link>
           <span className="text-muted-foreground">
             Pas encore de compte ?{" "}
-            <Link href="/inscription" className="text-primary font-medium hover:underline">
+            <Link href="/inscription" className="text-ink-900 font-semibold underline">
               Créer mon entreprise
             </Link>
           </span>

@@ -35,7 +35,7 @@ async function runOrQueue(run: () => Promise<ActionState>, offline: FieldAction)
 }
 
 const big =
-  "flex min-h-16 items-center justify-center gap-2 rounded-2xl px-4 text-lg font-bold shadow-sm active:scale-[0.98] transition disabled:opacity-60";
+  "flex min-h-16 items-center justify-center gap-2 rounded-2xl border-2 border-ink-900 px-4 text-lg font-bold active:scale-[0.98] transition disabled:opacity-60";
 
 export function FieldButtons({
   siteId,
@@ -61,7 +61,11 @@ export function FieldButtons({
             if (result.ok) setArrived(new Date().toISOString());
           })
         }
-        className={cn(big, arrived ? "bg-emerald-100 text-emerald-900" : "bg-emerald-600 text-white")}
+        className={cn(
+          big,
+          "font-heading col-span-2 min-h-[76px] text-2xl font-extrabold",
+          arrived ? "border-emerald-700 bg-emerald-100 text-emerald-900" : "bg-signal-400 text-ink-900",
+        )}
       >
         {pending ? (
           <Loader2 className="size-6 animate-spin" />
@@ -70,17 +74,23 @@ export function FieldButtons({
         )}
         {arrived ? "Arrivé ✔" : "J'arrive"}
       </button>
-      <Link href={`/w/photo?chantier=${siteId}`} className={cn(big, "bg-orange-600 text-white")}>
+      <Link
+        href={`/w/photo?chantier=${siteId}`}
+        className={cn(big, "text-ink-900 min-h-24 flex-col gap-1 bg-white")}
+      >
         <Camera className="size-6" aria-hidden /> Photo
       </Link>
-      <Link href={`/w/vocal?chantier=${siteId}`} className={cn(big, "bg-sky-700 text-white")}>
+      <Link
+        href={`/w/vocal?chantier=${siteId}`}
+        className={cn(big, "text-ink-900 min-h-24 flex-col gap-1 bg-white")}
+      >
         <Mic className="size-6" aria-hidden /> Vocal
       </Link>
       <button
         type="button"
         disabled={!currentStep || pending}
         onClick={() => setConfirm(true)}
-        className={cn(big, "bg-stone-800 text-white")}
+        className={cn(big, "text-ink-900 col-span-2 bg-transparent")}
       >
         <CheckCircle2 className="size-6" aria-hidden /> Étape terminée
       </button>
@@ -130,7 +140,7 @@ export function WorkerTasks({ tasks }: { tasks: { id: string; title: string; don
           <label className="flex min-h-14 items-center gap-3 rounded-xl border bg-white px-4 text-base">
             <input
               type="checkbox"
-              className="size-6 accent-orange-600"
+              className="accent-ink-900 size-6"
               checked={t.done}
               onChange={(e) => {
                 const done = e.target.checked;
@@ -146,7 +156,7 @@ export function WorkerTasks({ tasks }: { tasks: { id: string; title: string; don
                 });
               }}
             />
-            <span className={t.done ? "text-stone-400 line-through" : ""}>{t.title}</span>
+            <span className={t.done ? "text-ink-400 line-through" : ""}>{t.title}</span>
           </label>
         </li>
       ))}

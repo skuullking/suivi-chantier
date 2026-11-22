@@ -143,8 +143,8 @@ export function NewSiteWizard(props: {
                 i < step
                   ? "bg-emerald-600 text-white"
                   : i === step
-                    ? "bg-orange-600 text-white"
-                    : "bg-stone-200",
+                    ? "bg-signal-600 text-white"
+                    : "bg-ink-200",
               )}
             >
               {i < step ? <Check className="size-4" aria-hidden /> : i + 1}
@@ -152,7 +152,7 @@ export function NewSiteWizard(props: {
             <span className={cn("text-sm", i === step ? "font-semibold" : "text-muted-foreground")}>
               {label}
             </span>
-            {i < STEPS.length - 1 ? <ChevronRight className="size-4 text-stone-300" aria-hidden /> : null}
+            {i < STEPS.length - 1 ? <ChevronRight className="text-ink-300 size-4" aria-hidden /> : null}
           </li>
         ))}
       </ol>
@@ -203,7 +203,7 @@ export function NewSiteWizard(props: {
                         onClick={() => setClientId(c.id)}
                         className={cn(
                           "rounded-lg border px-3 py-2 text-left text-sm",
-                          clientId === c.id ? "border-orange-500 bg-orange-50" : "hover:bg-stone-50",
+                          clientId === c.id ? "border-signal-500 bg-signal-50" : "hover:bg-ink-50",
                         )}
                       >
                         <span className="font-medium">{c.name}</span>
@@ -333,7 +333,7 @@ export function NewSiteWizard(props: {
                       onClick={() => setTemplateId(t.id)}
                       className={cn(
                         "rounded-lg border p-3 text-left",
-                        templateId === t.id ? "border-orange-500 bg-orange-50" : "hover:bg-stone-50",
+                        templateId === t.id ? "border-signal-500 bg-signal-50" : "hover:bg-ink-50",
                       )}
                     >
                       <span className="font-medium">{t.name}</span>

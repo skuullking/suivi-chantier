@@ -13,7 +13,7 @@ export default async function ResetPasswordPage({ params }: { params: Promise<{ 
   return (
     <Card>
       <CardHeader>
-        <CardTitle as="h1" className="text-xl">
+        <CardTitle as="h1" className="text-3xl">
           Nouveau mot de passe
         </CardTitle>
         {valid ? (

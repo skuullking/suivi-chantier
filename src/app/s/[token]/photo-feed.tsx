@@ -29,14 +29,14 @@ export function PhotoFeed({ photos }: { photos: Photo[] }) {
             <button
               type="button"
               onClick={() => setIndex(i)}
-              className="block aspect-[4/3] w-full overflow-hidden rounded-xl bg-stone-200"
+              className="bg-ink-200 block aspect-[4/3] w-full overflow-hidden rounded-xl"
               aria-label={`Agrandir la photo ${p.caption}`}
               data-testid="portal-photo"
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- signed private URL */}
               <img src={p.thumbnail} alt={p.caption} loading="lazy" className="size-full object-cover" />
             </button>
-            {p.caption ? <p className="mt-1 truncate text-xs text-stone-600">{p.caption}</p> : null}
+            {p.caption ? <p className="text-ink-600 mt-1 truncate text-xs">{p.caption}</p> : null}
           </li>
         ))}
       </ul>

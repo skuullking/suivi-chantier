@@ -75,7 +75,7 @@ export default async function WhatsAppSimulatorPage({
           data-testid="wa-conversation"
         >
           {messages.length === 0 ? (
-            <li className="text-center text-sm text-stone-500">Aucun message.</li>
+            <li className="text-ink-500 text-center text-sm">Aucun message.</li>
           ) : null}
           {messages.map((m) => {
             const inbound = m.direction === "INBOUND";
@@ -97,7 +97,7 @@ export default async function WhatsAppSimulatorPage({
                   {label}
                   {m.body ?? ""}
                 </p>
-                <p className="mt-1 text-right text-[10px] text-stone-500">
+                <p className="text-ink-500 mt-1 text-right text-[10px]">
                   {formatTime(m.createdAt)}
                   {inbound && m.status ? ` · ${m.status}` : ""}
                 </p>

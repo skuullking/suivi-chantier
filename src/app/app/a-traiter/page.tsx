@@ -60,7 +60,7 @@ export default async function InboxPage() {
       <div className="grid gap-8">
         <section className="grid gap-3" aria-labelledby="summaries-title">
           <h2 id="summaries-title" className="flex items-center gap-2 text-lg font-semibold">
-            <Sparkles className="size-5 text-violet-700" aria-hidden /> Résumés du jour à approuver (
+            <Sparkles className="text-ink-800 size-5" aria-hidden /> Résumés du jour à approuver (
             {summaries.length})
           </h2>
           {summaries.length === 0 ? (
@@ -84,7 +84,7 @@ export default async function InboxPage() {
 
         <section className="grid gap-3" aria-labelledby="items-title">
           <h2 id="items-title" className="flex items-center gap-2 text-lg font-semibold">
-            <Inbox className="size-5 text-sky-700" aria-hidden /> Éléments reçus à classer ({items.length})
+            <Inbox className="text-ink-800 size-5" aria-hidden /> Éléments reçus à classer ({items.length})
           </h2>
           {items.length === 0 ? (
             <p className="text-muted-foreground text-sm">
@@ -146,7 +146,7 @@ export default async function InboxPage() {
 
         <section className="grid gap-3" aria-labelledby="photos-title">
           <h2 id="photos-title" className="flex items-center gap-2 text-lg font-semibold">
-            <Camera className="size-5 text-orange-700" aria-hidden /> Photos à valider ({photos.length})
+            <Camera className="text-signal-700 size-5" aria-hidden /> Photos à valider ({photos.length})
           </h2>
           {!canValidate ? (
             <p className="text-muted-foreground text-sm">La validation des photos est réservée au patron.</p>

@@ -51,8 +51,8 @@ type Step = {
 };
 
 const STATUS_STYLES = {
-  TODO: "border-stone-200 bg-white",
-  IN_PROGRESS: "border-orange-300 bg-orange-50/60",
+  TODO: "border-ink-200 bg-white",
+  IN_PROGRESS: "border-signal-300 bg-signal-50/60",
   DONE: "border-emerald-200 bg-emerald-50/60",
 } as const;
 
@@ -154,16 +154,16 @@ function SortableStep({
       <div className="flex min-w-0 flex-1 items-center gap-2">
         <button
           type="button"
-          className="cursor-grab touch-none rounded p-1 text-stone-400 hover:bg-stone-100 active:cursor-grabbing"
+          className="text-ink-400 hover:bg-ink-100 cursor-grab touch-none rounded p-1 active:cursor-grabbing"
           aria-label={`Déplacer l'étape ${step.title}`}
           {...attributes}
           {...listeners}
         >
           <GripVertical className="size-4" />
         </button>
-        <span className="w-6 text-right text-sm text-stone-400 tabular-nums">{index + 1}</span>
+        <span className="text-ink-400 w-6 text-right text-sm tabular-nums">{index + 1}</span>
         <div className="min-w-0">
-          <p className={cn("font-medium", step.status === "DONE" && "text-stone-500 line-through")}>
+          <p className={cn("font-medium", step.status === "DONE" && "text-ink-500 line-through")}>
             {step.title}
           </p>
           <p className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">

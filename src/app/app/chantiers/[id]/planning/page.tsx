@@ -36,7 +36,7 @@ export default async function SitePlanningPage({
           </Link>
         </Button>
         <h2 className="font-semibold">{board.title}</h2>
-        <Link href="/app/planning" className="ml-auto text-sm text-orange-700 hover:underline">
+        <Link href="/app/planning" className="text-signal-700 ml-auto text-sm hover:underline">
           Planning de toute l&apos;équipe
         </Link>
       </div>

@@ -64,8 +64,8 @@ export function ClientImport() {
           <CardTitle>1. Choisir le fichier</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-3">
-          <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 text-center hover:border-orange-400">
-            <FileUp className="size-8 text-stone-400" aria-hidden />
+          <label className="hover:border-signal-400 flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed p-8 text-center">
+            <FileUp className="text-ink-400 size-8" aria-hidden />
             <span className="font-medium">{fileName ?? "Choisir un fichier .csv"}</span>
             <span className="text-muted-foreground text-xs">
               Séparateur virgule ou point-virgule, première ligne = titres des colonnes
@@ -117,7 +117,7 @@ export function ClientImport() {
                 <caption className="text-muted-foreground p-2 text-left text-xs">
                   Aperçu des 5 premières lignes
                 </caption>
-                <thead className="bg-stone-50 text-left text-xs uppercase">
+                <thead className="bg-ink-50 text-left text-xs uppercase">
                   <tr>
                     <th className="px-3 py-2">Nom</th>
                     <th className="px-3 py-2">E-mail</th>

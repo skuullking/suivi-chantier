@@ -82,11 +82,11 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
                   <Link
                     key={s.id}
                     href={`/app/chantiers/${s.id}`}
-                    className="grid gap-2 rounded-lg border p-3 hover:bg-stone-50 sm:grid-cols-[1fr_200px] sm:items-center"
+                    className="hover:bg-ink-50 grid gap-2 rounded-lg border p-3 sm:grid-cols-[1fr_200px] sm:items-center"
                   >
                     <div>
                       <p className="flex items-center gap-2 font-medium">
-                        <HardHat className="size-4 text-stone-400" aria-hidden /> {s.title}
+                        <HardHat className="text-ink-400 size-4" aria-hidden /> {s.title}
                         <SiteStatusBadge status={s.status} />
                       </p>
                       <p className="text-muted-foreground text-xs">
@@ -142,16 +142,16 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
                   href={`tel:${p.replace(/\s/g, "")}`}
                   className="flex items-center gap-2 hover:underline"
                 >
-                  <Phone className="size-4 text-stone-400" aria-hidden /> {p}
+                  <Phone className="text-ink-400 size-4" aria-hidden /> {p}
                 </a>
               ))}
               {client.emails.map((e) => (
                 <a key={e} href={`mailto:${e}`} className="flex items-center gap-2 break-all hover:underline">
-                  <Mail className="size-4 text-stone-400" aria-hidden /> {e}
+                  <Mail className="text-ink-400 size-4" aria-hidden /> {e}
                 </a>
               ))}
               {client.addresses.map((a) => (
-                <p key={a} className="text-stone-700">
+                <p key={a} className="text-ink-700">
                   {a}
                 </p>
               ))}
@@ -159,7 +159,7 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
                 Communications : {client.consentCommunications ? "acceptées" : "non consenties"}
               </p>
               {client.notes ? (
-                <div className="mt-2 rounded-lg bg-stone-50 p-3 whitespace-pre-wrap text-stone-700">
+                <div className="bg-ink-50 text-ink-700 mt-2 rounded-lg p-3 whitespace-pre-wrap">
                   {client.notes}
                 </div>
               ) : null}

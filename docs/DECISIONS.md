@@ -176,3 +176,18 @@ Format : date — décision — raison.
   ≥ 10 ans pour les documents ; purge automatique désactivée par défaut.
 - **Docker non testé en exécution** : le démon Docker de la machine de développement ne démarre pas ; les fichiers
   sont validés par `docker compose config` (aussi en CI).
+
+## Refonte visuelle « Ruban »
+
+- **Direction artistique** : signalétique de chantier. Fond béton clair `#F0EFEA`, encre `#121212`, un seul signal
+  jaune `#FFD400` toujours avec du texte noir (action principale, élément actif, étape en cours). Le ruban hachuré
+  jaune/noir (`hazard`) est réservé aux retards. Pas d'ombres ni de dégradés : filets 1 px, rayons 10 à 14 px.
+- **Typographies** (via `next/font`, auto-hébergées) : Bricolage Grotesque pour les titres, Geist pour l'interface,
+  JetBrains Mono pour les étiquettes, codes, dates et montants (utilitaire `label-mono`).
+- **Palette** : échelles Tailwind `ink-*` (neutres) et `signal-*` (jaune, puis encre pour les teintes foncées) qui
+  remplacent les anciennes `stone-*` / `orange-*` ; les couleurs décoratives hors palette (bleu, violet, ambre)
+  ont été ramenées à ces deux échelles. Les vert/rouge restent pour « terminé » et « en retard ».
+- **Avancement** : `StepRibbon` (un segment par étape) en plus de la barre de progression accessible.
+- **Mobile patron** : barre d'onglets en bas (Accueil, Chantiers, Ajouter, À traiter, Planning) sous `lg`,
+  le menu complet reste dans le tiroir.
+- Maquettes de référence : canevas « ChantierLink — Redesign » (Artifact privé).

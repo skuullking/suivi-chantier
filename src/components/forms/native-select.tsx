@@ -35,7 +35,7 @@ export function NativeSelect({
           name={name}
           aria-invalid={errors?.length ? true : undefined}
           aria-describedby={errors?.length ? `${fieldId}-error` : undefined}
-          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive h-9 w-full appearance-none rounded-lg border bg-transparent px-3 pr-9 text-sm shadow-xs outline-none focus-visible:ring-3 disabled:opacity-50"
+          className="border-input focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:border-destructive bg-card h-11 w-full appearance-none rounded-[10px] border px-3 pr-9 text-sm shadow-xs outline-none focus-visible:ring-3 disabled:opacity-50"
           {...props}
         >
           {placeholder ? <option value="">{placeholder}</option> : null}

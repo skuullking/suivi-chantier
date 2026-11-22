@@ -2,7 +2,7 @@ import { Download, HardHat, LayoutGrid, List, MapPin, Plus } from "lucide-react"
 import type { Metadata } from "next";
 import Link from "next/link";
 import { EmptyState, PageHeader } from "@/components/app/page-header";
-import { LateBadge, ProgressBar, SiteStatusBadge } from "@/components/app/status";
+import { LateBadge, ProgressBar, SiteStatusBadge, StepRibbon } from "@/components/app/status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { SiteStatus } from "@/generated/prisma/enums";
@@ -67,7 +67,7 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
       />
 
       <form
-        className="mb-4 grid gap-2 rounded-xl border bg-white p-3 sm:grid-cols-2 lg:grid-cols-6"
+        className="border-ink-200 mb-5 grid gap-2 rounded-[14px] border bg-white p-3 sm:grid-cols-2 lg:grid-cols-6"
         role="search"
       >
         <Input
@@ -81,7 +81,7 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
           name="statut"
           defaultValue={status}
           aria-label="Statut"
-          className="h-9 rounded-lg border bg-white px-2 text-sm"
+          className="border-input h-11 rounded-[10px] border bg-white px-3 text-sm"
         >
           <option value="ACTIVE">En cours et à venir</option>
           <option value="ALL">Tous les statuts</option>
@@ -95,7 +95,7 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
           name="client"
           defaultValue={sp.client ?? ""}
           aria-label="Client"
-          className="h-9 rounded-lg border bg-white px-2 text-sm"
+          className="border-input h-11 rounded-[10px] border bg-white px-3 text-sm"
         >
           <option value="">Tous les clients</option>
           {clients.map((c) => (
@@ -108,7 +108,7 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
           name="equipe"
           defaultValue={sp.equipe ?? ""}
           aria-label="Équipe"
-          className="h-9 rounded-lg border bg-white px-2 text-sm"
+          className="border-input h-11 rounded-[10px] border bg-white px-3 text-sm"
         >
           <option value="">Toute l&apos;équipe</option>
           {members.map((m) => (
@@ -156,9 +156,9 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
           }
         />
       ) : table ? (
-        <div className="overflow-x-auto rounded-xl border bg-white">
+        <div className="border-ink-200 overflow-x-auto rounded-[14px] border bg-white">
           <table className="w-full text-sm">
-            <thead className="bg-stone-50 text-left text-xs text-stone-600 uppercase">
+            <thead className="label-mono text-ink-600 text-left">
               <tr>
                 <th className="px-4 py-3 font-medium">Chantier</th>
                 <th className="px-4 py-3 font-medium">Client</th>
@@ -168,14 +168,14 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
                 <th className="w-48 px-4 py-3 font-medium">Progression</th>
               </tr>
             </thead>
-            <tbody className="divide-y">
+            <tbody className="divide-ink-100 border-ink-100 divide-y border-t">
               {sites.map((s) => (
-                <tr key={s.id} className="hover:bg-stone-50" data-testid="site-row">
+                <tr key={s.id} className="hover:bg-ink-50" data-testid="site-row">
                   <td className="px-4 py-3">
-                    <Link href={`/app/chantiers/${s.id}`} className="font-medium hover:underline">
+                    <Link href={`/app/chantiers/${s.id}`} className="font-semibold hover:underline">
                       {s.title}
                     </Link>
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-ink-600 font-mono text-xs">
                       {s.code}
                       {s.city ? ` · ${s.city}` : ""}
                     </p>
@@ -208,23 +208,27 @@ export default async function SitesPage({ searchParams }: { searchParams: Promis
               key={s.id}
               href={`/app/chantiers/${s.id}`}
               data-testid="site-card"
-              className="grid gap-3 rounded-xl border bg-white p-4 shadow-xs transition hover:border-orange-300 hover:shadow-sm"
+              className="border-ink-200 hover:border-ink-900 grid content-start gap-3.5 rounded-[14px] border bg-white p-5 transition-colors"
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="truncate font-semibold text-stone-900">{s.title}</p>
-                  <p className="text-muted-foreground truncate text-sm">{s.client.name}</p>
+                <p className="label-mono text-ink-600 pt-1">{s.code}</p>
+                <div className="flex flex-wrap justify-end gap-1">
+                  {s.lateness.late ? <LateBadge /> : <SiteStatusBadge status={s.status} />}
                 </div>
-                <span className="rounded bg-stone-100 px-1.5 py-0.5 font-mono text-xs text-stone-600">
-                  {s.code}
+              </div>
+              <div className="min-w-0">
+                <p className="font-heading text-ink-900 truncate text-xl font-bold tracking-tight">
+                  {s.title}
+                </p>
+                <p className="text-ink-600 truncate text-sm">{s.client.name}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <StepRibbon steps={s.steps} size="sm" className="flex-1" />
+                <span className="font-mono text-xs font-bold tabular-nums">
+                  {Math.round(s.progress)} %<span className="sr-only"> d&apos;avancement</span>
                 </span>
               </div>
-              <div className="flex flex-wrap gap-1">
-                <SiteStatusBadge status={s.status} />
-                {s.lateness.late ? <LateBadge /> : null}
-              </div>
-              <ProgressBar value={s.progress} label={`Progression de ${s.title}`} />
-              <div className="text-muted-foreground flex items-center justify-between gap-2 text-xs">
+              <div className="text-ink-600 flex items-center justify-between gap-2 font-mono text-xs">
                 <span className="flex min-w-0 items-center gap-1">
                   <MapPin className="size-3 shrink-0" aria-hidden />
                   <span className="truncate">{s.city ?? s.address}</span>

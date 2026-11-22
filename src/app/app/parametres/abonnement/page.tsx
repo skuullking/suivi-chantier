@@ -49,7 +49,7 @@ export default async function SubscriptionPage({
         </p>
       ) : null}
       {!o.enabled ? (
-        <p className="mb-4 rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-900">
+        <p className="border-ink-200 bg-ink-100 text-ink-900 mb-4 rounded-xl border p-3 text-sm">
           La facturation est désactivée sur cette installation (<code>BILLING_ENABLED=false</code>) : aucune
           limite ne s&apos;applique. Les formules ci-dessous restent consultables.
         </p>
@@ -110,7 +110,7 @@ export default async function SubscriptionPage({
         {o.plans.map((p) => {
           const current = p.id === o.plan.id && o.status === "ACTIVE";
           return (
-            <Card key={p.id} className={cn(current && "border-orange-400")} data-testid={`plan-${p.id}`}>
+            <Card key={p.id} className={cn(current && "border-signal-400")} data-testid={`plan-${p.id}`}>
               <CardHeader>
                 <CardTitle>{p.name}</CardTitle>
               </CardHeader>
@@ -134,7 +134,7 @@ export default async function SubscriptionPage({
                   </li>
                 </ul>
                 {current ? (
-                  <p className="font-semibold text-orange-700">Votre formule actuelle</p>
+                  <p className="text-signal-700 font-semibold">Votre formule actuelle</p>
                 ) : (
                   <ChoosePlanButton plan={p.id} label={`Choisir ${p.name}`} />
                 )}
