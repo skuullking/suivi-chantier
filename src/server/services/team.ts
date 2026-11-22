@@ -251,3 +251,43 @@ export async function acceptInvitation(input: {
   });
   return result;
 }
+
+/** Links (or unlinks with null) the WhatsApp number of a member. Numbers are unique across the platform. */
+export async function setMemberWhatsApp(ctx: ServiceContext, membershipId: string, phone: string | null) {
+  assertCan(ctx.actor, "members.manage", { organizationId: ctx.organizationId });
+  const membership = await db.membership.findFirst({
+    where: { id: membershipId, organizationId: ctx.organizationId },
+    include: { user: { select: { name: true } } },
+  });
+  if (!membership) throw new NotFoundError("Membre introuvable.");
+  const { toE164 } = await import("@/server/domain/whatsapp-commands");
+  const e164 = phone?.trim() ? toE164(phone) : null;
+  if (e164 && !/^\+\d{8,15}$/.test(e164))
+    throw new AppError("Numéro invalide. Exemple : 06 12 34 56 78 ou +33612345678.");
+  await db.$transaction(async (tx) => {
+    await tx.whatsAppContact.deleteMany({
+      where: { organizationId: ctx.organizationId, userId: membership.userId },
+    });
+    if (!e164) return;
+    const taken = await tx.whatsAppContact.findUnique({ where: { phoneE164: e164 } });
+    if (taken) throw new AppError("Ce numéro WhatsApp est déjà associé à un autre compte.");
+    await tx.whatsAppContact.create({
+      data: {
+        organizationId: ctx.organizationId,
+        userId: membership.userId,
+        phoneE164: e164,
+        label: membership.user.name,
+      },
+    });
+  });
+  await audit({
+    organizationId: ctx.organizationId,
+    actorId: ctx.userId,
+    action: "member.whatsapp",
+    entityType: "membership",
+    entityId: membershipId,
+    after: { phone: e164 },
+    ip: ctx.ip,
+  });
+  return e164;
+}

@@ -5,10 +5,22 @@ import { logger } from "@/server/logger";
 import { JOB_HANDLERS, type JobName, type JobPayloads } from "./handlers";
 
 let instance: Promise<PgBoss> | null = null;
+let role: "producer" | "worker" = "producer";
+
+/** The worker process supervises queues and runs schedules; the web app only sends jobs. */
+export function setBossRole(r: "producer" | "worker") {
+  role = r;
+}
 
 export function boss(): Promise<PgBoss> {
   instance ??= (async () => {
-    const b = new PgBoss({ connectionString: env().DATABASE_URL, schema: "pgboss" });
+    const worker = role === "worker";
+    const b = new PgBoss({
+      connectionString: env().DATABASE_URL,
+      schema: "pgboss",
+      supervise: worker,
+      schedule: worker,
+    });
     b.on("error", (error) => logger.error({ err: error }, "pg-boss"));
     await b.start();
     for (const name of Object.keys(JOB_HANDLERS)) await b.createQueue(name).catch(() => {});

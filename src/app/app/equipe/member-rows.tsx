@@ -1,14 +1,19 @@
 "use client";
 
 import { MessageCircle, Trash2, X } from "lucide-react";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { toast } from "sonner";
 import { ConfirmButton } from "@/components/app/confirm-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { ActionState } from "@/lib/action-state";
 import { ROLE_LABELS } from "@/lib/labels";
-import { changeRoleAction, removeMemberAction, revokeInvitationAction } from "@/server/actions/team";
+import {
+  changeRoleAction,
+  removeMemberAction,
+  revokeInvitationAction,
+  setWhatsAppAction,
+} from "@/server/actions/team";
 
 type Role = "OWNER" | "OFFICE" | "WORKER";
 
@@ -39,13 +44,12 @@ export function MemberRow(props: {
           {props.phone ? ` · ${props.phone}` : ""}
         </p>
         <p className="text-muted-foreground text-xs">
-          {props.whatsapp ? (
-            <span className="inline-flex items-center gap-1">
-              <MessageCircle className="size-3" /> WhatsApp {props.whatsapp}
-            </span>
-          ) : (
-            "WhatsApp non associé"
-          )}
+          <WhatsAppLink
+            membershipId={props.membershipId}
+            name={props.name}
+            current={props.whatsapp}
+            phone={props.phone}
+          />
           {props.lastLogin ? ` · dernière connexion le ${props.lastLogin}` : ""}
         </p>
       </div>
@@ -110,5 +114,57 @@ export function PendingInvitationRow(props: {
         <X /> Annuler
       </Button>
     </div>
+  );
+}
+
+function WhatsAppLink(props: {
+  membershipId: string;
+  name: string;
+  current: string | null;
+  phone: string | null;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(props.current ?? props.phone ?? "");
+  const [pending, startTransition] = useTransition();
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => setEditing(true)}
+        className="inline-flex items-center gap-1 hover:underline"
+        aria-label={`Modifier le numéro WhatsApp de ${props.name}`}
+      >
+        <MessageCircle className="size-3" />
+        {props.current ? `WhatsApp ${props.current}` : "Associer un numéro WhatsApp"}
+      </button>
+    );
+  }
+  return (
+    <span className="inline-flex items-center gap-1">
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        aria-label={`Numéro WhatsApp de ${props.name}`}
+        placeholder="06 12 34 56 78"
+        className="h-7 w-40 rounded border bg-white px-2 text-xs"
+      />
+      <Button
+        size="sm"
+        className="h-7"
+        disabled={pending}
+        onClick={() =>
+          startTransition(async () => {
+            const result = await setWhatsAppAction(props.membershipId, value);
+            notify(result);
+            if (result.ok) setEditing(false);
+          })
+        }
+      >
+        Enregistrer
+      </Button>
+      <Button size="sm" variant="ghost" className="h-7" onClick={() => setEditing(false)}>
+        Annuler
+      </Button>
+    </span>
   );
 }

@@ -42,12 +42,13 @@ Légende : `[x]` fait · `[ ]` à faire
 
 ## Phase 4 — IA et WhatsApp
 
-- [ ] Adapters messagerie / transcription / LLM
-- [ ] Webhook WhatsApp + rattachement + « À traiter »
-- [ ] Commandes texte, transcription
-- [ ] Résumé du jour
-- [ ] Simulateur `/dev/whatsapp`
-- [ ] E2E n°3
+- [x] Adapters messagerie (mock / Meta Cloud API), transcription (mock / Whisper), LLM (mock / Claude), OCR (unpdf + mock / tesseract)
+- [x] Webhook WhatsApp (vérification, signature, idempotence) + rattachement avec confiance + « À traiter » (OK / Changer / Ignorer)
+- [x] Commandes texte (J'arrive, Terminé, Étape terminée, Problème : …), transcription des vocaux → journal
+- [x] Résumé du jour (tâche planifiée + bouton), brouillon → approbation éditable → e-mail + portail ; envoi auto en option
+- [x] Simulateur `/dev/whatsapp` (payload Meta signé vers le vrai webhook), numéros WhatsApp dans Équipe
+- [x] Process `worker` (pg-boss : files + tâches planifiées)
+- [x] E2E n°3 + tests d'intégration WhatsApp
 
 ## Phase 5 — Paperasse automatique
 

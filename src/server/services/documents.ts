@@ -16,6 +16,7 @@ import { loadClientFor, loadSiteFor, siteMemberIds } from "./access";
 import { audit } from "./audit";
 import { recordSiteEvent } from "./events";
 import { ftsIds, sortByIds } from "./fts";
+import { enqueue } from "@/server/jobs/queue";
 import { assertStorageLimit } from "./plan-limits";
 
 export type UploadedFile = { name: string; type?: string; bytes: Uint8Array };
@@ -105,10 +106,11 @@ export async function uploadDocuments(ctx: ServiceContext, files: UploadedFile[]
         clientId,
         type: options.type,
         visibleToClient: options.visibleToClient,
-        // A type chosen by hand is trusted; otherwise the classification pipeline proposes one.
-        processed: Boolean(options.type),
+        // Always analysed (text extraction for search); a type chosen by hand is kept.
+        processed: false,
       });
       created.push({ id: doc.id, name: doc.name });
+      if (doc.processingStatus === "PENDING") await enqueue("document.process", { documentId: doc.id });
       if (options.siteId) {
         await recordSiteEvent({
           organizationId: ctx.organizationId,

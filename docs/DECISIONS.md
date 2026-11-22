@@ -105,3 +105,29 @@ Format : date — décision — raison.
   fait foi.
 - **404 dans l'espace bureau** : les pages `/app` sont diffusées en streaming (état de chargement) ; un chantier
   introuvable affiche la page « Page introuvable » dans un statut HTTP 200 (les pages `/w` et l'API renvoient 404).
+
+## 2026-11-22 — Phase 4
+
+- **Rattachement d'un message WhatsApp** : (a) seul chantier prévu aujourd'hui pour l'expéditeur (et pas d'autre
+  chantier cité) → 0,95 ; (b) chantier cité (code court `DUP-1`, nom du client ou du chantier) → 0,9 ; (c) sinon IA
+  (Claude) ou heuristique locale (GPS de la photo, planning de la semaine, mots du message). Seuil
+  `AUTO_CLASSIFY_THRESHOLD` (0,75) : au-dessus classé, en dessous « À traiter » avec la proposition et sa raison.
+- **IA réelle optionnelle et jamais bloquante** : en cas de refus (`stop_reason: "refusal"`), d'erreur réseau ou de
+  sortie invalide, l'heuristique locale prend le relais. Effort `low` pour le classement, `medium` pour le résumé.
+- **Numéro inconnu** : une réponse polie au plus une fois par 24 h et par numéro ; le message est ignoré (journalisé).
+- **Commandes** reconnues sans accents ni casse, avec ou sans emoji : « J'arrive », « Terminé » (départ),
+  « Étape terminée », « Problème : … » (note interne + notification, jamais visible du client) ; tout autre texte
+  devient une note interne du chantier.
+- **Vocaux** : transcription en tâche de fond → note « vocal » interne. Un vocal commençant par « Problème » devient
+  un problème. Le résumé du jour n'utilise que les faits visibles par le client (photos, étapes visibles terminées,
+  vocaux et notes non internes hors problèmes).
+- **Résumé du jour** : unique par chantier et par jour ; régénérable tant qu'il est en brouillon ; jamais réécrit une
+  fois envoyé. L'e-mail n'est envoyé que si le client a donné son accord et a une adresse ; il est publié sur le
+  portail dans tous les cas.
+- **Pipeline documents (OCR + classement)** avancé en phase 4 car les documents arrivent aussi par WhatsApp. Les PDF
+  avec couche texte sont lus directement (unpdf) ; les PDF scannés sans texte ne sont pas rastérisés (pas de
+  dépendance native supplémentaire) : ils passent par « À traiter ». Un type choisi à la main n'est jamais écrasé.
+- **Worker** (`pnpm worker`) : consomme les files pg-boss (`JOBS_MODE=queue`) et lance les tâches planifiées
+  (résumés toutes les 15 min selon l'heure de chaque entreprise, maintenance quotidienne) quel que soit le mode.
+- **Simulateur WhatsApp** : construit un payload au format Meta, le signe avec `WHATSAPP_APP_SECRET` et l'envoie au
+  vrai webhook ; les médias simulés sont stockés sous `dev/` et lus par l'adapter mock.

@@ -3,6 +3,8 @@
  * works in UTC on such values. "Today" is computed in the organization's time zone, then converted.
  */
 
+import { TZDate } from "@date-fns/tz";
+
 const DAY_MS = 24 * 3600 * 1000;
 
 /** "2026-11-23" → Date at 00:00 UTC. Throws on malformed input. */
@@ -91,4 +93,19 @@ export function isoWeek(date: Date): number {
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
   return Math.ceil(((d.getTime() - yearStart.getTime()) / DAY_MS + 1) / 7);
+}
+
+/** UTC instants [start, end) of a calendar day ("YYYY-MM-DD") in a time zone. */
+export function dayRangeInTimeZone(dayKey: string, timeZone = "Europe/Paris"): { start: Date; end: Date } {
+  const [y, m, d] = dayKey.split("-").map(Number) as [number, number, number];
+  const start = new TZDate(y, m - 1, d, 0, 0, 0, timeZone);
+  const end = new TZDate(y, m - 1, d + 1, 0, 0, 0, timeZone);
+  return { start: new Date(start.getTime()), end: new Date(end.getTime()) };
+}
+
+/** Hour (0-23) of an instant in a time zone. */
+export function hourInTimeZone(instant: Date, timeZone = "Europe/Paris"): number {
+  return Number(
+    new Intl.DateTimeFormat("en-GB", { hour: "2-digit", hourCycle: "h23", timeZone }).format(instant),
+  );
 }

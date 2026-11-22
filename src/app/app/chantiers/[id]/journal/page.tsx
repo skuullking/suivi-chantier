@@ -5,6 +5,7 @@ import { requireManager } from "@/server/auth/context";
 import { loadSite } from "../site-data";
 import { describeEvent } from "@/server/services/events";
 import { siteJournal } from "@/server/services/notes";
+import { GenerateSummaryButton } from "./generate-summary";
 import { NoteForm } from "./note-form";
 
 const SUMMARY_LABELS = {
@@ -32,8 +33,9 @@ export default async function SiteJournalPage({ params }: { params: Promise<{ id
         </Card>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between gap-2">
             <CardTitle>Résumés du jour</CardTitle>
+            <GenerateSummaryButton siteId={id} />
           </CardHeader>
           <CardContent className="grid gap-3">
             {summaries.length === 0 ? (

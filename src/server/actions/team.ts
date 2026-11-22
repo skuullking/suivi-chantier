@@ -5,7 +5,13 @@ import { z } from "zod";
 import { formValues, type ActionState, zodFieldErrors } from "@/lib/action-state";
 import { invitationSchema, ROLES } from "@/lib/validation/auth";
 import { requireOwner } from "@/server/auth/context";
-import { changeMemberRole, createInvitation, removeMember, revokeInvitation } from "@/server/services/team";
+import {
+  changeMemberRole,
+  createInvitation,
+  removeMember,
+  revokeInvitation,
+  setMemberWhatsApp,
+} from "@/server/services/team";
 import { toActionError } from "./helpers";
 
 export async function inviteMemberAction(_prev: ActionState, formData: FormData): Promise<ActionState> {
@@ -54,6 +60,21 @@ export async function removeMemberAction(membershipId: string): Promise<ActionSt
     await removeMember(ctx, z.string().min(1).parse(membershipId));
     revalidatePath("/app/equipe");
     return { ok: true, message: "Membre retiré de l'équipe." };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function setWhatsAppAction(membershipId: string, phone: string): Promise<ActionState> {
+  const ctx = await requireOwner();
+  try {
+    const e164 = await setMemberWhatsApp(
+      ctx,
+      z.string().min(1).parse(membershipId),
+      z.string().max(30).parse(phone) || null,
+    );
+    revalidatePath("/app/equipe");
+    return { ok: true, message: e164 ? `WhatsApp associé : ${e164}` : "Numéro WhatsApp retiré." };
   } catch (error) {
     return toActionError(error);
   }

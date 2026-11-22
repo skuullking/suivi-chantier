@@ -98,6 +98,7 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   "invitation.accepted": "Invitation acceptée",
   "member.role_changed": "Changement de rôle",
   "member.removed": "Membre retiré",
+  "member.whatsapp": "Numéro WhatsApp associé",
   "client.create": "Client créé",
   "client.update": "Client modifié",
   "client.archive": "Client archivé",
