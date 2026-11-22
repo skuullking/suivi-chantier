@@ -13,6 +13,8 @@ export type ServiceContext = {
   userId: string;
   organizationId: string;
   ip?: string | null;
+  /** IANA time zone of the organization ("today" computations). */
+  organizationTimeZone?: string;
 };
 
 export type AuthContext = ServiceContext & {
@@ -54,6 +56,7 @@ export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
     organizationId: org.id,
     role: membership.role,
     ip: clientIpFromHeaders(h),
+    organizationTimeZone: org.timezone,
     actor: {
       kind: "member",
       userId: session.userId,

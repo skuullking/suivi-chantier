@@ -23,14 +23,14 @@ Légende : `[x]` fait · `[ ]` à faire
 
 ## Phase 2 — Cœur métier
 
-- [ ] Clients
-- [ ] Chantiers + assistant + fiche à onglets
-- [ ] Modèles d'étapes, étapes, progression
-- [ ] Documents (upload, aperçu, recherche)
-- [ ] Planning + tâches
-- [ ] Tableau de bord, recherche globale, notifications, audit
-- [ ] Seed complet
-- [ ] E2E n°1
+- [x] Clients (liste, recherche plein texte, étiquettes, fiche, archivage, historique)
+- [x] Chantiers : liste cartes / tableau + filtres, assistant 3 étapes, fiche à onglets (Résumé, Étapes, Planning, Documents, Journal)
+- [x] Modèles d'étapes (éditeur), étapes (glisser-déposer, statut, poids, visibilité client), progression pondérée + retards
+- [x] Documents : envoi multiple glisser-déposer, type MIME réel vérifié, aperçu, téléchargement signé, visible client, recherche plein texte
+- [x] Planning semaine / mois, par personne / par chantier, glisser-déposer, conflits ; tâches
+- [x] Tableau de bord (alertes, chantiers, activité, prise en main), recherche Ctrl/Cmd+K, notifications, journal d'audit
+- [x] Seed complet (4 clients, 3 chantiers, photos générées, PDF, planning de la semaine)
+- [x] E2E n°1 + tests d'intégration multi-tenant
 
 ## Phase 3 — Ouvrier + Client
 

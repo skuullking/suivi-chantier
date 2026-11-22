@@ -200,6 +200,7 @@ model Organization {
   notes            Note[]
   siteEvents       SiteEvent[]
   messageLogs      MessageLog[]
+  siteMembers      SiteMember[]
 }
 
 model User {
@@ -224,6 +225,7 @@ model User {
   pushSubscriptions   PushSubscription[]
   notes               Note[]
   documentsUploaded   Document[]
+  siteMemberships     SiteMember[]
 }
 
 model Session {
@@ -356,6 +358,7 @@ model Site {
   notes          Note[]
   events         SiteEvent[]
   inboxProposals InboxItem[]        @relation("InboxProposedSite")
+  members        SiteMember[]
 
   @@unique([organizationId, code])
   @@index([organizationId])
@@ -363,6 +366,22 @@ model Site {
   @@index([clientId])
   @@index([plannedStart])
   @@index([searchVector], type: Gin)
+}
+
+/// Team of a site: users allowed to see it (workers only see sites they are members of).
+model SiteMember {
+  id             String       @id @default(cuid())
+  organizationId String
+  siteId         String
+  userId         String
+  createdAt      DateTime     @default(now())
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  site           Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@index([userId])
+  @@index([organizationId])
 }
 
 model StepTemplate {

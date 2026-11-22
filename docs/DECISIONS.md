@@ -68,3 +68,22 @@ Format : date — décision — raison.
 - **Limitation de débit** : multiplicateur `RATE_LIMIT_MULTIPLIER` (1 par défaut) pour les tests E2E.
 - **shadcn/ui (style radix-nova)** : il utilise le paquet `cn` (dépôt officiel shadcn-ui) ; `CardTitle` rend un vrai
   titre (`h2` par défaut, `h1` sur les pages d'authentification) pour l'accessibilité.
+
+## 2026-11-22 — Phase 2
+
+- **Équipe d'un chantier : table `SiteMember`** (ajoutée au schéma). Le planning est daté ; l'équipe définit qui voit le
+  chantier. Planifier quelqu'un sur un chantier l'ajoute automatiquement à l'équipe. Les permissions ouvrier
+  (`assignedUserIds`) reposent sur cette table.
+- **Ressource d'une autre organisation = « introuvable »** (jamais « interdit ») pour ne pas révéler son existence ;
+  un ouvrier non affecté reçoit aussi « introuvable ».
+- **Code court de chantier** : 3 lettres du nom du client + compteur de l'organisation (`DUP-1`), utilisable dans
+  WhatsApp.
+- **Progression** : seules les étapes « Terminée » comptent (pondérées) ; une étape en retard = date de fin prévue
+  dépassée et non terminée ; un chantier terminé ou archivé n'est jamais en retard.
+- **Fichiers** : type réel détecté par le contenu (`file-type`) ; HTML / SVG / XML toujours refusés ; texte et CSV
+  acceptés seulement si le contenu est du texte UTF-8 sans balise active ; noms nettoyés ; clé de stockage aléatoire
+  (jamais dérivée du nom).
+- **Adresses** : une par ligne (elles contiennent des virgules) ; l'assistant découpe « rue, CP ville ».
+- **Recherche globale** : route `GET /api/search` (session + limitation de débit) appelée par la palette `cmdk`
+  sans filtrage côté client.
+- **Onglets « Photos » et « Espace client »** masqués jusqu'à la phase 3.
