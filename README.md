@@ -56,7 +56,7 @@ Puis ouvrez **http://localhost:3000**.
 | http://localhost:3000/dev/inbound-mail                                                                                                                 | Simuler une facture reçue par e-mail              |
 | [http://localhost:3000/s/demo-dupont-suivi-chantier-0123456789abcdefABCDEF](http://localhost:3000/s/demo-dupont-suivi-chantier-0123456789abcdefABCDEF) | Portail client de démonstration (chantier Dupont) |
 
-Variante en plusieurs terminaux : `pnpm db:local` (base), puis `pnpm setup` (migrations + démo), puis `pnpm dev:all`
+Variante en plusieurs terminaux : `pnpm db:local` (base), puis `pnpm run setup` (migrations + démo), puis `pnpm dev:all`
 (application + worker) ou `pnpm dev` (application seule).
 
 Les données locales (base, fichiers) sont dans le dossier `.local/` (ignoré par git). Pour repartir de zéro : arrêter
@@ -84,7 +84,7 @@ fichier `.env.production` à la racine (mêmes variables) : il est prioritaire e
 développement n'est pas utilisé par les conteneurs : les deux modes cohabitent dans le même dossier.
 
 Docker peut aussi ne servir que pour les services de développement : `docker compose -f docker-compose.dev.yml up -d`
-(PostgreSQL :5433, MinIO :9000/:9001, Mailpit :8025), puis `pnpm setup && pnpm dev:all` avec
+(PostgreSQL :5433, MinIO :9000/:9001, Mailpit :8025), puis `pnpm run setup && pnpm dev:all` avec
 `STORAGE_DRIVER=s3` / `MAIL_DRIVER=smtp` dans `.env`.
 
 ## 3. Comptes et parcours de démonstration
@@ -117,7 +117,7 @@ Parcours conseillés :
 | ---------------------------------------------- | ---------------------------------------------------------------- |
 | `pnpm dev:local`                               | Base embarquée + migrations + application + worker (sans Docker) |
 | `pnpm db:local`                                | Démarre seulement la base PostgreSQL embarquée (port 5433)       |
-| `pnpm setup`                                   | Attend la base, applique les migrations, charge la démo          |
+| `pnpm run setup`                               | Attend la base, applique les migrations, charge la démo          |
 | `pnpm dev` / `pnpm dev:all`                    | Application seule / application + worker                         |
 | `pnpm worker`                                  | Tâches de fond et tâches planifiées (résumés, rappels, purge…)   |
 | `pnpm db:seed`                                 | Recrée l'entreprise de démonstration                             |

@@ -1,7 +1,7 @@
 /**
  * One-shot local setup: waits for PostgreSQL, applies migrations and loads the demo data.
- *   pnpm setup            → migrate + seed (demo organization recreated)
- *   pnpm setup --no-seed  → migrate only
+ *   pnpm run setup            → migrate + seed (demo organization recreated)
+ *   pnpm run setup --no-seed  → migrate only
  */
 import "dotenv/config";
 import { execSync } from "node:child_process";
