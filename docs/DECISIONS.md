@@ -1,0 +1,48 @@
+# Journal des décisions
+
+Format : date — décision — raison.
+
+## 2026-11-22 — Cadrage initial
+
+- **Nom du produit : ChantierLink (conservé).** Clair, explicite pour la cible, déjà utilisé dans le cahier des charges.
+- **Branche de travail `feat/chantierlink`.** On ne committe pas directement sur `main` ; fusion proposée à la fin.
+- **Gestionnaire de paquets : pnpm.** Rapide, installé sur la machine, lockfile strict.
+- **Next.js (App Router) dernière version stable, React 19, TypeScript strict.** Conforme au cahier des charges.
+- **Authentification maison (modèle « Lucia »)** plutôt qu'Auth.js : mots de passe hachés avec argon2id
+  (`@node-rs/argon2`), sessions stockées en base (le cookie contient un jeton aléatoire, la base n'en garde que le
+  SHA-256), cookie `httpOnly` + `SameSite=Lax` + `Secure` en HTTPS. Raison : contrôle total du multi-tenant et des rôles,
+  pas de dépendance à une bibliothèque encore en bêta, code court et testable.
+- **Jobs asynchrones : pg-boss** (pas de Redis à opérer). Un process `worker` séparé exécute les jobs et les tâches
+  planifiées (résumés du jour, rappels de la veille, purge de rétention).
+- **Fichiers : abstraction `StorageProvider`** avec un driver S3 (MinIO en local, n'importe quel S3 UE en production) et
+  un driver `local` (système de fichiers). Les fichiers ne sont **jamais publics** : l'application génère des URL
+  `/api/files/...` signées par HMAC avec expiration courte et diffuse le contenu elle-même. Cela fonctionne derrière
+  n'importe quel reverse proxy et permet au portail client (sans session) d'afficher les photos validées.
+- **MinIO** : la distribution communautaire n'est plus publiée sous forme d'images maintenues depuis fin 2025. On utilise
+  la dernière image publiée pour le développement et la démo ; en production, toute solution S3 hébergée en UE convient
+  (Scaleway, OVH, Garage auto-hébergé…). Voir `docs/BRANCHER_LES_SERVICES.md`.
+- **E-mail de développement : Mailpit** au lieu de MailHog (abandonné). Même usage : SMTP sur 1025, interface web sur 8025.
+- **PWA : service worker écrit à la main** (`public/sw.js`) plutôt que Serwist, dont l'intégration dépend de webpack alors
+  que Next.js compile désormais avec Turbopack. Le besoin (cache de la journée, repli hors-ligne) reste simple.
+- **Recherche plein texte : PostgreSQL** (configuration `french` + `unaccent`).
+- **Limitation de débit : table PostgreSQL** (fenêtre fixe, upsert atomique) — fonctionne avec plusieurs instances sans Redis.
+- **En-têtes de sécurité** : CSP avec nonce générée dans `proxy.ts`, HSTS, `X-Frame-Options: SAMEORIGIN`,
+  `X-Content-Type-Options: nosniff`, `Referrer-Policy`. CSRF : les Server Actions vérifient l'origine nativement ; les
+  route handlers qui modifient des données vérifient l'en-tête `Origin`.
+- **IA réelle : API Anthropic** via `@anthropic-ai/sdk`, modèle `claude-opus-5-5` par défaut (surchargeable par
+  `ANTHROPIC_MODEL`), sorties structurées validées par Zod. En cas de refus ou d'erreur, repli sur l'heuristique locale
+  et passage par « À traiter ».
+- **OCR réel : tesseract.js** (langue `fra`) ; le texte des PDF est d'abord extrait directement (`unpdf`).
+- **Transcription réelle : Whisper** via une API compatible (OpenAI audio ou serveur `whisper.cpp`), URL configurable.
+- **SMS : pas de passerelle SMS.** Le bouton « Envoyer par SMS » ouvre l'application SMS du téléphone avec le message et
+  le lien pré-remplis (`sms:`). Les envois automatiques passent par e-mail et WhatsApp.
+- **Floutage des visages / plaques : manuel.** L'utilisateur dessine des zones à flouter (et peut recadrer) ; une copie
+  modifiée est générée avec `sharp`, l'original reste intact. Pas de détection automatique (modèle ML lourd à embarquer).
+- **PDF de fin de chantier : pdfkit**, généré par le worker.
+- **Plans d'abonnement** : Solo 29 €/mois (2 membres, 10 Go), Équipe 59 €/mois (6 membres : patron + 5 employés,
+  50 Go), Pro 99 €/mois (membres illimités, 200 Go). Essai gratuit 14 jours. Facturation derrière le flag
+  `BILLING_ENABLED` (désactivé = aucune limite).
+- **Image Docker unique** (`node:24-bookworm-slim`) pour l'app, le worker et la migration ; glibc pour éviter les
+  soucis de binaires natifs (argon2, sharp, Prisma).
+- **Pages `/dev/*`** actives hors production, ou si `ENABLE_DEV_TOOLS=true` (activé dans le compose de démonstration
+  pour tout essayer sans clé ; à désactiver en vraie production).
