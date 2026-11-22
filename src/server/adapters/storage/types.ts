@@ -11,6 +11,8 @@ export interface StorageProvider {
   delete(key: string): Promise<void>;
   /** Deletes every object under a prefix (organization deletion). */
   deletePrefix(prefix: string): Promise<void>;
+  /** Every object key (backups). */
+  listKeys(prefix?: string): AsyncIterable<string>;
   healthcheck(): Promise<void>;
 }
 

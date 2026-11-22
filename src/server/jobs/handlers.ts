@@ -1,5 +1,6 @@
 /** Job registry: name → payload type → handler. */
 import { purgeExpiredRateLimits } from "@/server/security/rate-limit";
+import { runRetentionPurge } from "@/server/services/gdpr";
 import { generateHandover } from "@/server/services/handover";
 import { deliverPendingNotifications } from "@/server/services/notify-channels";
 import { runDayBeforeReminders } from "@/server/services/reminders";
@@ -19,6 +20,7 @@ export type JobPayloads = {
   "handover.generate": { organizationId: string; siteId: string; userId: string; signatures: boolean };
   "notifications.deliver": Record<string, never>;
   "reminders.tick": Record<string, never>;
+  "retention.purge": Record<string, never>;
 };
 
 export type JobName = keyof JobPayloads;
@@ -36,4 +38,5 @@ export const JOB_HANDLERS: { [N in JobName]: (payload: JobPayloads[N]) => Promis
   "handover.generate": (p) => generateHandover(p),
   "notifications.deliver": () => deliverPendingNotifications(),
   "reminders.tick": () => runDayBeforeReminders(),
+  "retention.purge": () => runRetentionPurge(),
 };

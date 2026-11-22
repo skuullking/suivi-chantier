@@ -12,6 +12,7 @@ import { assertCan } from "@/server/permissions/can";
 import { storage } from "@/server/adapters/storage";
 import { assertMembers, loadClientFor, loadSiteFor } from "./access";
 import { audit } from "./audit";
+import { assertSubscriptionUsable } from "./billing";
 import { createClient } from "./clients";
 import { recordSiteEvent } from "./events";
 import { ftsIds, sortByIds } from "./fts";
@@ -139,6 +140,7 @@ function siteInfoData(info: SiteInfoInput) {
 /** Wizard: client (existing or new) → info → step template + team. */
 export async function createSite(ctx: ServiceContext, rawInput: NewSiteInput) {
   assertCan(ctx.actor, "site.create", { organizationId: ctx.organizationId });
+  await assertSubscriptionUsable(ctx.organizationId);
   const parsed = newSiteSchema.safeParse(rawInput);
   if (!parsed.success) {
     const fieldErrors: Record<string, string[]> = {};

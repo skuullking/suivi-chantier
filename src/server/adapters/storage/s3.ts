@@ -108,6 +108,22 @@ export class S3StorageProvider implements StorageProvider {
     } while (token);
   }
 
+  async *listKeys(prefix = "") {
+    await this.ensureBucket();
+    let token: string | undefined;
+    do {
+      const list = await this.client.send(
+        new ListObjectsV2Command({
+          Bucket: this.config.bucket,
+          Prefix: prefix || undefined,
+          ContinuationToken: token,
+        }),
+      );
+      for (const o of list.Contents ?? []) if (o.Key) yield o.Key;
+      token = list.IsTruncated ? list.NextContinuationToken : undefined;
+    } while (token);
+  }
+
   async healthcheck() {
     await this.ensureBucket();
   }

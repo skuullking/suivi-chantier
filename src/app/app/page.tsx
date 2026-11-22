@@ -21,6 +21,7 @@ import { SLOT_LABELS } from "@/lib/labels";
 import { cn } from "@/lib/utils";
 import { requireManager } from "@/server/auth/context";
 import { dashboardData } from "@/server/services/dashboard";
+import { OnboardingActions } from "./dismiss-onboarding";
 
 export const metadata: Metadata = { title: "Tableau de bord" };
 
@@ -100,10 +101,11 @@ export default async function DashboardPage() {
 
       {showOnboarding ? (
         <Card className="mb-6 border-orange-200 bg-orange-50/40" data-testid="onboarding">
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between gap-2">
             <CardTitle>
               Prise en main — {onboardingDone}/{onboardingSteps.length}
             </CardTitle>
+            <OnboardingActions canDismiss={ctx.role === "OWNER"} />
           </CardHeader>
           <CardContent className="grid gap-3">
             <ProgressBar

@@ -104,6 +104,8 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   "client.archive": "Client archivé",
   "client.unarchive": "Client désarchivé",
   "client.anonymize": "Client anonymisé",
+  "client.delete": "Client supprimé définitivement",
+  "settings.retention": "Durées de conservation modifiées",
   "client.export": "Export des données d'un client",
   "client.import": "Import de clients (CSV)",
   "site.export": "Export ZIP d'un chantier",

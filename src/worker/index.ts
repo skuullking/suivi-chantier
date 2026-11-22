@@ -13,6 +13,7 @@ const SCHEDULES: { name: string; cron: string }[] = [
   { name: "reminders.tick", cron: "*/15 * * * *" },
   { name: "notifications.deliver", cron: "* * * * *" },
   { name: "maintenance.daily", cron: "30 3 * * *" },
+  { name: "retention.purge", cron: "0 4 * * *" },
 ];
 
 async function main() {

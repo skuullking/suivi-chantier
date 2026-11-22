@@ -1,0 +1,18 @@
+# Reverse proxy in front of ChantierLink. SITE_ADDRESS=":80" (demo) or your domain for automatic HTTPS (Let's Encrypt).
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	# Uploads up to MAX_UPLOAD_MB (+ margin)
+	request_body {
+		max_size 40MB
+	}
+
+	reverse_proxy app:3000 {
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

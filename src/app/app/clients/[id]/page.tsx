@@ -20,6 +20,7 @@ import { AUDIT_ACTION_LABELS } from "@/server/services/settings";
 import { siteOptions } from "@/server/services/sites";
 import { ClientForm } from "../client-form";
 import { ArchiveClientButton } from "./archive-button";
+import { PrivacyActions } from "./privacy-card";
 
 export const metadata: Metadata = { title: "Fiche client" };
 
@@ -162,6 +163,14 @@ export default async function ClientPage({ params }: { params: Promise<{ id: str
                   {client.notes}
                 </div>
               ) : null}
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Données personnelles</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PrivacyActions clientId={client.id} anonymized={Boolean(client.anonymizedAt)} />
             </CardContent>
           </Card>
           <Card>

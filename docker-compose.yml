@@ -1,0 +1,114 @@
+# ChantierLink — complete stack (production-like), one command:
+#   docker compose up -d --build
+# then open http://localhost (demo accounts: see README). E-mails sent: http://localhost:8025 (Mailpit).
+#
+# Configuration: docker/app.env (demo defaults, committed) overridden by .env.production (yours, git-ignored).
+# The development .env file is not used by the containers.
+name: chantierlink
+
+x-env-files: &env-files
+  - path: ./docker/app.env
+  - path: ./.env.production
+    required: false
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    env_file: *env-files
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  minio:
+    image: minio/minio:RELEASE.2025-09-07T16-13-09Z
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    env_file: *env-files
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    restart: unless-stopped
+    ports:
+      - "${MAILPIT_PORT:-8025}:8025"
+
+  migrate:
+    build: .
+    image: chantierlink:latest
+    env_file: *env-files
+    command:
+      [
+        "sh",
+        "-c",
+        'prisma migrate deploy && if [ "$${SEED_DEMO}" = "true" ]; then tsx prisma/seed.ts --if-missing; fi',
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    restart: "no"
+
+  app:
+    image: chantierlink:latest
+    restart: unless-stopped
+    env_file: *env-files
+    command: ["next", "start"]
+    volumes:
+      - ./backups:/app/backups
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  worker:
+    image: chantierlink:latest
+    restart: unless-stopped
+    env_file: *env-files
+    command: ["tsx", "src/worker/index.ts"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  caddy:
+    image: caddy:2.10-alpine
+    restart: unless-stopped
+    env_file: *env-files
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  miniodata:
+  caddy_data:
+  caddy_config:

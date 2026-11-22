@@ -68,7 +68,8 @@ Légende : `[x]` fait · `[ ]` à faire
 
 ## Phase 7 — Monétisation, RGPD, déploiement
 
-- [ ] Billing + limites + onboarding
-- [ ] RGPD (export, suppression, rétention) + pages légales
-- [ ] Dockerfile, docker-compose prod, Caddy, sauvegardes
-- [ ] README, BRANCHER_LES_SERVICES.md
+- [x] Abonnement (mock / Stripe, webhook), limites membres / stockage / fin d'essai, onboarding guidé (chantier d'exemple + lien client)
+- [x] RGPD : export complet, export / anonymisation / suppression d'un client, suppression du compte, rétention + purge ; pages légales modèles ; docs/RGPD.md
+- [x] Dockerfile, docker-compose prod-like (Postgres, MinIO, Mailpit, migrate+seed, app, worker, Caddy), sauvegarde / restauration testées (pnpm backup / restore, scripts/*.sh)
+- [x] README complet, docs/BRANCHER_LES_SERVICES.md, E2E n°7
+- [ ] `docker compose up` à vérifier sur la machine une fois Docker réparé (fichiers validés par `docker compose config`)

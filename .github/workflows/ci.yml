@@ -41,6 +41,8 @@ jobs:
         run: |
           PGPASSWORD=chantierlink psql -h localhost -p 5433 -U chantierlink -d chantierlink \
             -c "CREATE DATABASE chantierlink_test" -c "CREATE DATABASE chantierlink_e2e"
+      - name: Validate Docker Compose files
+        run: docker compose config --quiet && docker compose -f docker-compose.dev.yml config --quiet
       - name: Lint
         run: pnpm lint
       - name: Format

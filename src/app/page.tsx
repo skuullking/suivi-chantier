@@ -36,9 +36,15 @@ const FEATURES = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<{ compte?: string }> }) {
+  const { compte } = await searchParams;
   return (
     <div className="flex min-h-screen flex-col bg-stone-50">
+      {compte === "supprime" ? (
+        <p className="bg-emerald-50 px-4 py-3 text-center text-sm text-emerald-900" role="status">
+          Votre compte a été supprimé, ainsi que toutes ses données. Merci d&apos;avoir utilisé ChantierLink.
+        </p>
+      ) : null}
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-5">
         <Logo />
         <nav className="flex items-center gap-2">

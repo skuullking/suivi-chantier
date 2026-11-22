@@ -1,5 +1,5 @@
 import { createReadStream } from "node:fs";
-import { access, mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { access, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { assertSafeKey, type StorageProvider } from "./types";
 
@@ -50,6 +50,23 @@ export class LocalStorageProvider implements StorageProvider {
 
   async deletePrefix(prefix: string) {
     await rm(this.resolve(prefix.replace(/\/+$/, "")), { recursive: true, force: true });
+  }
+
+  async *listKeys(prefix = "") {
+    const walk = async function* (dir: string, base: string): AsyncGenerator<string> {
+      let entries;
+      try {
+        entries = await readdir(dir, { withFileTypes: true });
+      } catch {
+        return;
+      }
+      for (const entry of entries) {
+        const key = base ? `${base}/${entry.name}` : entry.name;
+        if (entry.isDirectory()) yield* walk(path.join(dir, entry.name), key);
+        else yield key;
+      }
+    };
+    for await (const key of walk(this.root, "")) if (key.startsWith(prefix)) yield key;
   }
 
   async healthcheck() {

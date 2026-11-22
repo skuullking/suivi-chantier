@@ -1,4 +1,4 @@
-import { ChevronRight, History, ListChecks } from "lucide-react";
+import { ChevronRight, CreditCard, History, ListChecks, ShieldCheck } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/app/page-header";
@@ -25,6 +25,18 @@ export default async function SettingsPage() {
       label: "Journal d'audit",
       description: "Les actions sensibles réalisées dans votre compte.",
       icon: History,
+    },
+    {
+      href: "/app/parametres/abonnement",
+      label: "Abonnement",
+      description: "Formule, essai gratuit, factures.",
+      icon: CreditCard,
+    },
+    {
+      href: "/app/parametres/donnees",
+      label: "Données et RGPD",
+      description: "Export complet, durées de conservation, suppression du compte.",
+      icon: ShieldCheck,
     },
   ];
   return (

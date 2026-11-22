@@ -162,3 +162,17 @@ Format : date — décision — raison.
   Web Push désactivé tant que `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` ne sont pas renseignées.
 - **E2E hors-ligne** : Playwright n'applique pas `setOffline` aux requêtes du service worker ; le test vérifie
   donc la file et la synchronisation (critère de la phase), le cache des pages étant vérifié manuellement.
+
+## 2026-11-22 — Phase 7
+
+- **Sauvegardes portables** : une table = un fichier JSON lignes + tous les fichiers via l'adapter de stockage, dans
+  une archive tar.gz (`pnpm backup` / `pnpm restore`). Raison : le PostgreSQL embarqué ne fournit pas `pg_dump`
+  et ce format marche en local comme sous Docker. Cycle sauvegarde → perte → restauration testé.
+- **Configuration Docker** dans `docker/app.env` + `.env.production` (via `env_file`), jamais le `.env` de
+  développement, pour que les deux modes cohabitent dans le même dossier.
+- **Facturation** : derrière `BILLING_ENABLED` ; fin d'essai sans abonnement = création de chantiers bloquée
+  (les données restent accessibles). Fournisseur simulé avec page de paiement factice.
+- **RGPD** : anonymisation (conserve chantiers et pièces comptables) ou suppression complète ; durées de conservation
+  ≥ 10 ans pour les documents ; purge automatique désactivée par défaut.
+- **Docker non testé en exécution** : le démon Docker de la machine de développement ne démarre pas ; les fichiers
+  sont validés par `docker compose config` (aussi en CI).
