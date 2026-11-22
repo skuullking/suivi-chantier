@@ -60,10 +60,11 @@ Légende : `[x]` fait · `[ ]` à faire
 
 ## Phase 6 — Hors-ligne et terrain
 
-- [ ] Service worker + cache
-- [ ] File IndexedDB + synchronisation
-- [ ] Notifications e-mail + push, rappels
-- [ ] E2E hors-ligne
+- [x] Service worker écrit à la main (pages `/w` en network-first + cache de la journée, statiques en cache-first, page hors-ligne, Background Sync, push)
+- [x] File IndexedDB (photos, vocaux, actions J'arrive / étape / tâches) avec `clientUploadId`, backoff, file visible (badge + page Moi, réessayer / supprimer)
+- [x] Notifications e-mail + Web Push (VAPID, `pnpm vapid`), livraison après validation de la transaction et chaque minute par le worker
+- [x] Rappel de la veille pour les ouvriers (heure réglable), badges réseau, états de chargement / erreur côté terrain
+- [x] E2E hors-ligne (3 photos sans réseau → synchronisées) + tests d'intégration (rappels, envoi des notifications)
 
 ## Phase 7 — Monétisation, RGPD, déploiement
 

@@ -3,12 +3,15 @@ import type { Metadata } from "next";
 import { ROLE_LABELS } from "@/lib/labels";
 import { signOutAction } from "@/server/actions/auth";
 import { requireAuth } from "@/server/auth/context";
+import { PushToggle } from "@/components/app/push-toggle";
+import { env } from "@/server/env";
 import { SyncStatus } from "./sync-status";
 
 export const metadata: Metadata = { title: "Moi" };
 
 export default async function MePage() {
   const ctx = await requireAuth();
+  const vapid = env().VAPID_PUBLIC_KEY ?? null;
   return (
     <div className="grid gap-4">
       <section className="rounded-2xl bg-white p-5 shadow-sm">
@@ -28,6 +31,7 @@ export default async function MePage() {
         </div>
       </section>
       <SyncStatus />
+      {vapid ? <PushToggle publicKey={vapid} /> : null}
       <form action={signOutAction}>
         <button
           type="submit"

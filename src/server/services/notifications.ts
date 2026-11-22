@@ -35,6 +35,12 @@ export async function notifyUsers(userIds: string[], input: NotificationInput, t
       link: input.link ?? null,
     })),
   });
+  // E-mail / push delivery once the transaction is committed: right after the HTTP response, or now when called
+  // outside a transaction. The worker also delivers every minute.
+  const { afterResponse, enqueue } = await import("@/server/jobs/queue");
+  if (!afterResponse(() => enqueue("notifications.deliver", {})) && tx === db) {
+    await enqueue("notifications.deliver", {}).catch(() => {});
+  }
 }
 
 /** Notifies OWNER + OFFICE members (optionally excluding the author of the change). */

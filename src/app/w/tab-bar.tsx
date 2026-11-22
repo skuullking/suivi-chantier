@@ -4,6 +4,7 @@ import { Camera, CircleUserRound, Mic, Sun } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { useQueueCount } from "./offline-sync";
 
 const TABS = [
   { href: "/w", label: "Aujourd'hui", icon: Sun },
@@ -15,6 +16,7 @@ const TABS = [
 /** Bottom navigation (thumb reachable, 64 px targets). */
 export function WorkerTabBar() {
   const pathname = usePathname();
+  const queued = useQueueCount();
   return (
     <nav
       aria-label="Navigation terrain"
@@ -36,7 +38,18 @@ export function WorkerTabBar() {
                   active ? "text-orange-700" : "text-stone-500",
                 )}
               >
-                <tab.icon className="size-6" aria-hidden />
+                <span className="relative">
+                  <tab.icon className="size-6" aria-hidden />
+                  {tab.href === "/w/moi" && queued > 0 ? (
+                    <span
+                      className="absolute -top-1.5 -right-2.5 flex min-w-5 items-center justify-center rounded-full bg-amber-500 px-1 text-[11px] text-white"
+                      aria-label={`${queued} envoi(s) en attente`}
+                      data-testid="queue-badge"
+                    >
+                      {queued}
+                    </span>
+                  ) : null}
+                </span>
                 {tab.label}
               </Link>
             </li>

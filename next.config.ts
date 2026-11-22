@@ -15,6 +15,7 @@ const nextConfig: NextConfig = {
     "@node-rs/argon2",
     "sharp",
     "exifr",
+    "web-push",
     "pdfkit",
     "archiver",
     "pg-boss",

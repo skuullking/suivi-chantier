@@ -104,7 +104,7 @@ Format : date — décision — raison.
 - **Horloge** : une date de prise de vue dans le futur (téléphone mal réglé) est ignorée ; la date de réception serveur
   fait foi.
 - **404 dans l'espace bureau** : les pages `/app` sont diffusées en streaming (état de chargement) ; un chantier
-  introuvable affiche la page « Page introuvable » dans un statut HTTP 200 (les pages `/w` et l'API renvoient 404).
+  introuvable affiche la page « Page introuvable » dans un statut HTTP 200 (idem pour `/w` depuis l'ajout de son état de chargement en phase 6 ; l'API renvoie 404).
 
 ## 2026-11-22 — Phase 4
 
@@ -146,3 +146,19 @@ Format : date — décision — raison.
   le navigateur (papaparse), 2 000 lignes maximum, doublons détectés par e-mail ou nom + téléphone.
 - **ZIP** : construits en flux (archiver) sans charger les fichiers en mémoire ; export chantier = documents
   originaux, photos par étape, `etapes.csv`, `photos.csv`, `journal.txt`.
+
+## 2026-11-22 — Phase 6
+
+- **File hors-ligne côté page (IndexedDB via `idb`)** : chaque photo / vocal est d'abord écrit localement, puis envoyé
+  dans l'ordre ; erreurs réseau → nouvel essai avec délai croissant (5 s → 10 min), erreurs définitives (fichier
+  refusé…) → visibles et supprimables dans « Moi ». L'idempotence côté serveur (`clientUploadId`) empêche les
+  doublons en cas de renvoi. Les actions (J'arrive, étape terminée, tâche) sont rejouées via `/api/w/actions`.
+- **Synchronisation** au retour du réseau (`online`), à la réouverture de l'app, toutes les 20 s si des éléments
+  attendent, et via Background Sync quand le navigateur le permet (Chrome / Android).
+- **Service worker** enregistré uniquement en production (ou `NEXT_PUBLIC_ENABLE_SW=true`) pour ne pas gêner le
+  développement. Les réponses des API ne sont jamais mises en cache.
+- **Notifications** : créées dans les transactions métier, envoyées (e-mail pour les types importants, Web Push pour
+  tous) juste après la réponse HTTP et chaque minute par le worker, une seule fois (colonne `deliveredAt`).
+  Web Push désactivé tant que `VAPID_PUBLIC_KEY` / `VAPID_PRIVATE_KEY` ne sont pas renseignées.
+- **E2E hors-ligne** : Playwright n'applique pas `setOffline` aux requêtes du service worker ; le test vérifie
+  donc la file et la synchronisation (critère de la phase), le cache des pages étant vérifié manuellement.

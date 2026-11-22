@@ -17,6 +17,22 @@ import {
 import { cn } from "@/lib/utils";
 import { setStepStatusAction, setTaskDoneAction } from "@/server/actions/business";
 import { arriveAction } from "@/server/actions/field";
+import { enqueueAction, type FieldAction, flushQueue } from "@/lib/offline-queue";
+import type { ActionState } from "@/lib/action-state";
+
+/** Runs a server action; without network the action is queued locally and replayed later. */
+async function runOrQueue(run: () => Promise<ActionState>, offline: FieldAction): Promise<ActionState> {
+  if (navigator.onLine) {
+    try {
+      return await run();
+    } catch {
+      // network failure: queue below
+    }
+  }
+  await enqueueAction(offline);
+  void flushQueue();
+  return { ok: true, message: "Enregistré ⏳ — envoi au retour du réseau." };
+}
 
 const big =
   "flex min-h-16 items-center justify-center gap-2 rounded-2xl px-4 text-lg font-bold shadow-sm active:scale-[0.98] transition disabled:opacity-60";
@@ -40,7 +56,7 @@ export function FieldButtons({
         disabled={pending || Boolean(arrived)}
         onClick={() =>
           startTransition(async () => {
-            const result = await arriveAction(siteId);
+            const result = await runOrQueue(() => arriveAction(siteId), { type: "arrive", siteId });
             notify(result);
             if (result.ok) setArrived(new Date().toISOString());
           })
@@ -82,7 +98,14 @@ export function FieldButtons({
               className="h-12"
               onClick={() =>
                 currentStep &&
-                startTransition(async () => notify(await setStepStatusAction(currentStep.id, "DONE")))
+                startTransition(async () =>
+                  notify(
+                    await runOrQueue(() => setStepStatusAction(currentStep.id, "DONE"), {
+                      type: "step_done",
+                      stepId: currentStep.id,
+                    }),
+                  ),
+                )
               }
             >
               Oui, c&apos;est terminé
@@ -113,7 +136,13 @@ export function WorkerTasks({ tasks }: { tasks: { id: string; title: string; don
                 const done = e.target.checked;
                 startTransition(async () => {
                   toggle({ id: t.id, done });
-                  notify(await setTaskDoneAction(t.id, done));
+                  notify(
+                    await runOrQueue(() => setTaskDoneAction(t.id, done), {
+                      type: "task",
+                      taskId: t.id,
+                      done,
+                    }),
+                  );
                 });
               }}
             />

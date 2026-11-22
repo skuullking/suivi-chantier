@@ -10,6 +10,8 @@ import { logger } from "@/server/logger";
 
 const SCHEDULES: { name: string; cron: string }[] = [
   { name: "summaries.tick", cron: "*/15 * * * *" },
+  { name: "reminders.tick", cron: "*/15 * * * *" },
+  { name: "notifications.deliver", cron: "* * * * *" },
   { name: "maintenance.daily", cron: "30 3 * * *" },
 ];
 

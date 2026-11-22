@@ -123,9 +123,10 @@ test("un ouvrier n'ouvre pas un chantier non affecté ; une organisation ne voit
   const worker = await workerContext.newPage();
   await signIn(worker, DEMO.worker1);
   await expect(worker).toHaveURL(/\/w$/);
-  const res = await worker.goto(`/w/chantier/${siteId}`);
-  expect(res?.status()).toBe(404);
+  // Worker pages stream (loading state): the 404 page is rendered in the response body.
+  await worker.goto(`/w/chantier/${siteId}`);
   await expect(worker.getByRole("heading", { name: "Page introuvable" })).toBeVisible();
+  await expect(worker.getByText("Rénovation toiture")).toHaveCount(0);
   await worker.goto("/app/chantiers");
   await expect(worker).toHaveURL(/\/w$/);
   // Upload to a site he is not assigned to: refused by the API

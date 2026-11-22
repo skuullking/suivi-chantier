@@ -2,15 +2,15 @@
 
 import { Check, Clock, ImagePlus, Loader2, RefreshCw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { newClientUploadId, sendMedia } from "@/lib/upload-client";
+import { enqueueUpload, flushQueue } from "@/lib/offline-queue";
+import { newClientUploadId } from "@/lib/upload-client";
 import { cn } from "@/lib/utils";
+import { useUploadStatuses } from "../offline-sync";
 import { TargetPicker, type UploadTarget } from "../target-picker";
 
 type Sent = {
   key: string;
   preview: string;
-  status: "sending" | "sent" | "waiting" | "error";
-  error?: string;
 };
 
 /**
@@ -33,6 +33,7 @@ export function CameraCapture({
   const [sent, setSent] = useState<Sent[]>([]);
   const [flash, setFlash] = useState(false);
   const position = useRef<GeolocationPosition | null>(null);
+  const statuses = useUploadStatuses(sent.map((x) => x.key));
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -75,9 +76,8 @@ export function CameraCapture({
 
   async function upload(blob: Blob, fileName: string) {
     const key = newClientUploadId();
-    const preview = URL.createObjectURL(blob);
-    setSent((list) => [{ key, preview, status: "sending" as const }, ...list].slice(0, 12));
-    const result = await sendMedia({
+    // Stored locally first (IndexedDB), then sent: nothing is lost without network.
+    await enqueueUpload({
       file: blob,
       fileName,
       siteId,
@@ -89,16 +89,9 @@ export function CameraCapture({
       latitude: position.current?.coords.latitude ?? null,
       longitude: position.current?.coords.longitude ?? null,
     });
-    setSent((list) =>
-      list.map((s) =>
-        s.key === key
-          ? result.ok
-            ? { ...s, status: "sent" }
-            : { ...s, status: result.retry ? "waiting" : "error", error: result.error }
-          : s,
-      ),
-    );
-    if (result.ok) setCaption("");
+    setSent((list) => [{ key, preview: URL.createObjectURL(blob) }, ...list].slice(0, 12));
+    setCaption("");
+    void flushQueue();
   }
 
   function shoot() {
@@ -196,41 +189,43 @@ export function CameraCapture({
 
         {sent.length ? (
           <ul className="grid grid-cols-4 gap-2" aria-label="Photos envoyées">
-            {sent.map((s) => (
-              <li
-                key={s.key}
-                className="relative aspect-square overflow-hidden rounded-lg bg-stone-200"
-                data-testid="sent-photo"
-                data-status={s.status}
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element -- local object URL preview */}
-                <img src={s.preview} alt="" className="size-full object-cover" />
-                <span
-                  className={cn(
-                    "absolute right-1 bottom-1 flex size-6 items-center justify-center rounded-full text-white",
-                    s.status === "sent" && "bg-emerald-600",
-                    s.status === "sending" && "bg-stone-700",
-                    s.status === "waiting" && "bg-amber-600",
-                    s.status === "error" && "bg-red-600",
-                  )}
-                  title={s.error}
-                  aria-label={
-                    s.status === "sent"
-                      ? "Envoyée"
-                      : s.status === "sending"
-                        ? "Envoi en cours"
-                        : s.status === "waiting"
-                          ? "En attente de réseau"
-                          : `Erreur : ${s.error}`
-                  }
+            {sent
+              .map((item) => ({ ...item, ...(statuses[item.key] ?? { status: "sending" as const }) }))
+              .map((s) => (
+                <li
+                  key={s.key}
+                  className="relative aspect-square overflow-hidden rounded-lg bg-stone-200"
+                  data-testid="sent-photo"
+                  data-status={s.status}
                 >
-                  {s.status === "sent" ? <Check className="size-4" /> : null}
-                  {s.status === "sending" ? <RefreshCw className="size-3.5 animate-spin" /> : null}
-                  {s.status === "waiting" ? <Clock className="size-4" /> : null}
-                  {s.status === "error" ? <X className="size-4" /> : null}
-                </span>
-              </li>
-            ))}
+                  {/* eslint-disable-next-line @next/next/no-img-element -- local object URL preview */}
+                  <img src={s.preview} alt="" className="size-full object-cover" />
+                  <span
+                    className={cn(
+                      "absolute right-1 bottom-1 flex size-6 items-center justify-center rounded-full text-white",
+                      s.status === "sent" && "bg-emerald-600",
+                      s.status === "sending" && "bg-stone-700",
+                      s.status === "waiting" && "bg-amber-600",
+                      s.status === "error" && "bg-red-600",
+                    )}
+                    title={s.error}
+                    aria-label={
+                      s.status === "sent"
+                        ? "Envoyée"
+                        : s.status === "sending"
+                          ? "Envoi en cours"
+                          : s.status === "waiting"
+                            ? "En attente de réseau"
+                            : `Erreur : ${s.error}`
+                    }
+                  >
+                    {s.status === "sent" ? <Check className="size-4" /> : null}
+                    {s.status === "sending" ? <RefreshCw className="size-3.5 animate-spin" /> : null}
+                    {s.status === "waiting" ? <Clock className="size-4" /> : null}
+                    {s.status === "error" ? <X className="size-4" /> : null}
+                  </span>
+                </li>
+              ))}
           </ul>
         ) : (
           <p className="text-center text-sm text-stone-500">

@@ -740,11 +740,14 @@ model Notification {
   body           String?
   link           String?
   readAt         DateTime?
+  /// E-mail / Web Push delivery done (or not needed).
+  deliveredAt    DateTime?
   createdAt      DateTime     @default(now())
   organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, readAt])
+  @@index([deliveredAt])
   @@index([organizationId])
 }
 

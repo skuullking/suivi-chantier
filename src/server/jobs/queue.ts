@@ -34,3 +34,13 @@ export async function enqueue<N extends JobName>(name: N, payload: JobPayloads[N
     await run();
   }
 }
+
+/** Runs `fn` after the current HTTP response. Returns false outside a request (nothing is scheduled). */
+export function afterResponse(fn: () => Promise<unknown>): boolean {
+  try {
+    after(() => fn().catch((error) => logger.error({ err: error }, "Tâche après réponse en échec")));
+    return true;
+  } catch {
+    return false;
+  }
+}

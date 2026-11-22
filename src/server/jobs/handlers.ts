@@ -1,6 +1,8 @@
 /** Job registry: name → payload type → handler. */
 import { purgeExpiredRateLimits } from "@/server/security/rate-limit";
 import { generateHandover } from "@/server/services/handover";
+import { deliverPendingNotifications } from "@/server/services/notify-channels";
+import { runDayBeforeReminders } from "@/server/services/reminders";
 import { processDocument } from "@/server/services/document-pipeline";
 import { processMedia } from "@/server/services/media";
 import { generateDailySummary, runDailySummaries } from "@/server/services/summaries";
@@ -15,6 +17,8 @@ export type JobPayloads = {
   "summaries.tick": Record<string, never>;
   "maintenance.daily": Record<string, never>;
   "handover.generate": { organizationId: string; siteId: string; userId: string; signatures: boolean };
+  "notifications.deliver": Record<string, never>;
+  "reminders.tick": Record<string, never>;
 };
 
 export type JobName = keyof JobPayloads;
@@ -30,4 +34,6 @@ export const JOB_HANDLERS: { [N in JobName]: (payload: JobPayloads[N]) => Promis
   "summaries.tick": () => runDailySummaries(),
   "maintenance.daily": () => purgeExpiredRateLimits(),
   "handover.generate": (p) => generateHandover(p),
+  "notifications.deliver": () => deliverPendingNotifications(),
+  "reminders.tick": () => runDayBeforeReminders(),
 };

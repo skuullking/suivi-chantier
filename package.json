@@ -26,7 +26,8 @@
     "prepare": "husky",
     "dev:local": "concurrently -k -n db,app -c blue,green \"pnpm db:local\" \"pnpm setup --no-seed && concurrently -k -n next,worker -c green,magenta \\\"pnpm dev\\\" \\\"pnpm worker\\\"\"",
     "worker": "tsx src/worker/index.ts",
-    "dev:all": "concurrently -k -n next,worker -c green,magenta \"pnpm dev\" \"pnpm worker\""
+    "dev:all": "concurrently -k -n next,worker -c green,magenta \"pnpm dev\" \"pnpm worker\"",
+    "vapid": "tsx scripts/generate-vapid.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.12.0",

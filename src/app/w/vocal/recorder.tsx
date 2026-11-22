@@ -2,15 +2,15 @@
 
 import { Check, Clock, Mic, Square, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { newClientUploadId, sendMedia } from "@/lib/upload-client";
+import { enqueueUpload, flushQueue } from "@/lib/offline-queue";
+import { newClientUploadId } from "@/lib/upload-client";
 import { cn } from "@/lib/utils";
+import { useUploadStatuses } from "../offline-sync";
 import { TargetPicker, type UploadTarget } from "../target-picker";
 
 type Sent = {
   key: string;
   seconds: number;
-  status: "sending" | "sent" | "waiting" | "error";
-  error?: string;
 };
 
 function pickMimeType() {
@@ -39,6 +39,7 @@ export function VoiceRecorder({
   const chunks = useRef<Blob[]>([]);
   const startedAt = useRef<number>(0);
   const fileInput = useRef<HTMLInputElement>(null);
+  const statuses = useUploadStatuses(sent.map((x) => x.key));
   const supported =
     typeof window !== "undefined" && pickMimeType() !== null && !!navigator.mediaDevices?.getUserMedia;
 
@@ -52,8 +53,7 @@ export function VoiceRecorder({
 
   async function upload(blob: Blob, fileName: string, duration: number) {
     const key = newClientUploadId();
-    setSent((list) => [{ key, seconds: duration, status: "sending" as const }, ...list]);
-    const result = await sendMedia({
+    await enqueueUpload({
       file: blob,
       fileName,
       siteId,
@@ -62,15 +62,8 @@ export function VoiceRecorder({
       capturedAt: new Date(startedAt.current || Date.now()).toISOString(),
       clientUploadId: key,
     });
-    setSent((list) =>
-      list.map((s) =>
-        s.key === key
-          ? result.ok
-            ? { ...s, status: "sent" }
-            : { ...s, status: result.retry ? "waiting" : "error", error: result.error }
-          : s,
-      ),
-    );
+    setSent((list) => [{ key, seconds: duration }, ...list]);
+    void flushQueue();
   }
 
   async function start() {
@@ -160,17 +153,21 @@ export function VoiceRecorder({
       </div>
       {sent.length ? (
         <ul className="grid gap-2" aria-label="Vocaux envoyés">
-          {sent.map((s) => (
-            <li key={s.key} className="flex min-h-12 items-center gap-3 rounded-xl bg-white px-4">
-              <Mic className="size-5 text-sky-700" aria-hidden />
-              <span className="flex-1">Vocal {s.seconds ? `de ${s.seconds} s` : ""}</span>
-              {s.status === "sent" ? <Check className="size-5 text-emerald-600" aria-label="Envoyé" /> : null}
-              {s.status === "sending" || s.status === "waiting" ? (
-                <Clock className="size-5 text-amber-600" aria-label="En attente" />
-              ) : null}
-              {s.status === "error" ? <X className="size-5 text-red-600" aria-label={s.error} /> : null}
-            </li>
-          ))}
+          {sent
+            .map((item) => ({ ...item, ...(statuses[item.key] ?? { status: "sending" as const }) }))
+            .map((s) => (
+              <li key={s.key} className="flex min-h-12 items-center gap-3 rounded-xl bg-white px-4">
+                <Mic className="size-5 text-sky-700" aria-hidden />
+                <span className="flex-1">Vocal {s.seconds ? `de ${s.seconds} s` : ""}</span>
+                {s.status === "sent" ? (
+                  <Check className="size-5 text-emerald-600" aria-label="Envoyé" />
+                ) : null}
+                {s.status === "sending" || s.status === "waiting" ? (
+                  <Clock className="size-5 text-amber-600" aria-label="En attente" />
+                ) : null}
+                {s.status === "error" ? <X className="size-5 text-red-600" aria-label={s.error} /> : null}
+              </li>
+            ))}
         </ul>
       ) : null}
     </div>
