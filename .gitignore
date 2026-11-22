@@ -1,0 +1,38 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# testing
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/e2e/.auth/
+
+# next.js / build
+/.next/
+/out/
+/build
+/dist
+
+# generated
+/src/generated/
+
+# local runtime data (embedded Postgres, local file storage)
+/.local/
+/backups/
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+.pnpm-debug.log*
+*.tsbuildinfo
+next-env.d.ts
+
+# env files (only the example is committed)
+.env
+.env.*
+!.env.example
