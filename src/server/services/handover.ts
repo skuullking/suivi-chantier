@@ -15,7 +15,8 @@ import { storeDocument } from "./documents";
 import { recordSiteEvent } from "./events";
 import { notifyUsers } from "./notifications";
 
-const ORANGE = "#c2410c";
+const INK = "#121212";
+const SIGNAL = "#ffd400";
 const GREY = "#57534e";
 /** Narrow / non-breaking spaces (fr-FR number format) and arrows are missing from the WinAnsi PDF fonts. */
 const PDF_SPACES = new RegExp(`[${String.fromCharCode(0x202f, 0xa0)}]`, "g");
@@ -79,10 +80,10 @@ export async function buildHandoverPdf(siteId: string, options: { signatures: bo
   const width = doc.page.width - 100;
 
   // ── Cover ──
-  doc.rect(0, 0, doc.page.width, 12).fill(ORANGE);
+  doc.rect(0, 0, doc.page.width, 12).fill(SIGNAL);
   doc
     .moveDown(4)
-    .fillColor(ORANGE)
+    .fillColor(INK)
     .fontSize(14)
     .text(site.organization.name.toUpperCase(), { characterSpacing: 1 });
   doc.moveDown(0.5).fillColor("#111").fontSize(28).text("Dossier de fin de chantier");
@@ -120,7 +121,7 @@ export async function buildHandoverPdf(siteId: string, options: { signatures: bo
 
   // ── Steps ──
   doc.addPage();
-  doc.fillColor(ORANGE).fontSize(18).text("Étapes du chantier");
+  doc.fillColor(INK).fontSize(18).text("Étapes du chantier");
   doc.moveDown(0.8);
   for (const step of site.steps) {
     const y = doc.y;
@@ -152,7 +153,7 @@ export async function buildHandoverPdf(siteId: string, options: { signatures: bo
   ].filter((g) => photosByStep.get(g.id)?.length);
   if (groups.length) {
     doc.addPage();
-    doc.fillColor(ORANGE).fontSize(18).text("Photos");
+    doc.fillColor(INK).fontSize(18).text("Photos");
     const colW = (width - 20) / 2;
     const imgH = colW * 0.72;
     for (const group of groups) {
@@ -192,7 +193,7 @@ export async function buildHandoverPdf(siteId: string, options: { signatures: bo
 
   // ── Documents ──
   doc.addPage();
-  doc.fillColor(ORANGE).fontSize(18).text("Documents du chantier", 50);
+  doc.fillColor(INK).fontSize(18).text("Documents du chantier", 50);
   doc.moveDown(0.8);
   if (site.documents.length === 0) doc.fillColor(GREY).fontSize(11).text("Aucun document.");
   for (const d of site.documents) {
@@ -208,7 +209,7 @@ export async function buildHandoverPdf(siteId: string, options: { signatures: bo
   // ── Signatures ──
   if (options.signatures) {
     if (doc.y > doc.page.height - 260) doc.addPage();
-    doc.moveDown(2).fillColor(ORANGE).fontSize(18).text("Réception", 50);
+    doc.moveDown(2).fillColor(INK).fontSize(18).text("Réception", 50);
     doc
       .moveDown(0.5)
       .fillColor(GREY)

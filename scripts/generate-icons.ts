@@ -4,10 +4,9 @@ import sharp from "sharp";
 
 const svg = (padding: number) => `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="${padding ? 0 : 112}" fill="#c2410c"/>
+  <rect width="512" height="512" rx="${padding ? 0 : 112}" fill="#ffd400"/>
   <g transform="translate(${padding} ${padding}) scale(${(512 - 2 * padding) / 512})">
-    <path d="M112 336 256 144l144 192" fill="none" stroke="#fff" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M176 336h160v48H176z" fill="#fff"/>
+    <path d="M128 352 256 160l128 192M192 352h128" fill="none" stroke="#121212" stroke-width="48" stroke-linecap="round" stroke-linejoin="round"/>
   </g>
 </svg>`;
 

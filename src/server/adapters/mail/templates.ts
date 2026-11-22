@@ -14,7 +14,7 @@ export function renderEmail(content: EmailContent): { html: string; text: string
     .map((p) => `<p style="margin:0 0 16px;line-height:1.5;color:#1f2937">${escape(p)}</p>`)
     .join("");
   const cta = content.cta
-    ? `<p style="margin:24px 0"><a href="${escape(content.cta.url)}" style="background:#c2410c;color:#ffffff;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">${escape(content.cta.label)}</a></p>
+    ? `<p style="margin:24px 0"><a href="${escape(content.cta.url)}" style="background:#ffd400;color:#121212;border:1px solid #121212;padding:12px 20px;border-radius:8px;text-decoration:none;font-weight:600;display:inline-block">${escape(content.cta.label)}</a></p>
        <p style="margin:0 0 16px;font-size:13px;color:#6b7280">Si le bouton ne fonctionne pas, copiez ce lien : ${escape(content.cta.url)}</p>`
     : "";
   const footer = content.footer ?? "Envoyé par ChantierLink.";
