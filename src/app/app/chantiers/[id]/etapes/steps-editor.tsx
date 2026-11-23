@@ -18,7 +18,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Eye, EyeOff, GripVertical, Pencil, Plus, Trash2 } from "lucide-react";
-import { useActionState, useState, useTransition } from "react";
+import { useActionState, useState, useOptimistic, useTransition } from "react";
 import { ConfirmButton } from "@/components/app/confirm-button";
 import { notify } from "@/components/app/notify";
 import { LateBadge } from "@/components/app/status";
@@ -139,7 +139,9 @@ function SortableStep({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: step.id,
   });
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
+  // New status shown immediately (colour, strike-through), confirmed by the server in the background.
+  const [status, setStatus] = useOptimistic(step.status);
   return (
     <li
       ref={setNodeRef}
@@ -147,7 +149,7 @@ function SortableStep({
       data-testid="step-row"
       className={cn(
         "flex flex-col gap-3 rounded-xl border p-3 sm:flex-row sm:items-center",
-        STATUS_STYLES[step.status],
+        STATUS_STYLES[status],
         isDragging && "relative z-10 shadow-lg",
       )}
     >
@@ -163,9 +165,7 @@ function SortableStep({
         </button>
         <span className="text-ink-400 w-6 text-right text-sm tabular-nums">{index + 1}</span>
         <div className="min-w-0">
-          <p className={cn("font-medium", step.status === "DONE" && "text-ink-500 line-through")}>
-            {step.title}
-          </p>
+          <p className={cn("font-medium", status === "DONE" && "text-ink-500 line-through")}>{step.title}</p>
           <p className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
             <span>
               Poids {step.weight} ({share} %)
@@ -187,11 +187,13 @@ function SortableStep({
       <div className="flex items-center gap-1">
         <select
           aria-label={`Statut de l'étape ${step.title}`}
-          value={step.status}
-          disabled={pending}
+          value={status}
           onChange={(e) => {
-            const value = e.target.value;
-            startTransition(async () => notify(await setStepStatusAction(step.id, value)));
+            const value = e.target.value as Step["status"];
+            startTransition(async () => {
+              setStatus(value);
+              notify(await setStepStatusAction(step.id, value));
+            });
           }}
           className="h-9 rounded-lg border bg-white px-2 text-sm"
         >

@@ -2,6 +2,12 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "chantierlink-local",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev:local"],
+      "port": 3000
+    },
+    {
       "name": "chantierlink-dev",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["dev:all"],

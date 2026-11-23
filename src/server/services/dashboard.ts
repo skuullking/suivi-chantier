@@ -3,6 +3,7 @@ import type { ServiceContext } from "@/server/auth/context";
 import { db } from "@/server/db";
 import { nextStep, siteLateness } from "@/server/domain/progress";
 import { assertCan } from "@/server/permissions/can";
+import { openInboxCount, pendingPhotoCount } from "./counters";
 import { describeEvent } from "./events";
 
 export async function dashboardData(ctx: ServiceContext) {
@@ -21,8 +22,8 @@ export async function dashboardData(ctx: ServiceContext) {
         },
         orderBy: [{ status: "asc" }, { plannedEnd: { sort: "asc", nulls: "last" } }],
       }),
-      db.media.count({ where: { organizationId: orgId, kind: "PHOTO", validationStatus: "PENDING" } }),
-      db.inboxItem.count({ where: { organizationId: orgId, status: "OPEN" } }),
+      pendingPhotoCount(orgId),
+      openInboxCount(orgId),
       db.dailySummary.count({ where: { organizationId: orgId, status: "DRAFT" } }),
       db.siteEvent.findMany({
         where: { organizationId: orgId },

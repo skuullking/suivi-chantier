@@ -57,3 +57,59 @@ export function sessionCookieOptions(expiresAt: Date) {
     expires: expiresAt,
   };
 }
+
+export type ResolvedSession = {
+  sessionId: string;
+  expiresAt: Date;
+  userId: string;
+  userEmail: string;
+  userName: string;
+  userPhone: string | null;
+  role: "OWNER" | "OFFICE" | "WORKER";
+  orgId: string;
+  orgName: string;
+  orgSlug: string;
+  orgTrade: string;
+  orgTimezone: string;
+  orgPlan: string;
+  orgSubscriptionStatus: string;
+  orgTrialEndsAt: Date | null;
+  orgOnboardingDismissed: boolean;
+  orgOfficeCanValidatePhotos: boolean;
+};
+
+/**
+ * Session + user + membership + organization in ONE round trip (runs on every authenticated request).
+ * Same rules as `validateSessionToken`: expired sessions are deleted, sliding renewal near expiry.
+ */
+export async function resolveSession(token: string): Promise<ResolvedSession | null> {
+  const id = hashToken(token);
+  const rows = await db.$queryRaw<ResolvedSession[]>`
+    SELECT s."id" AS "sessionId", s."expiresAt",
+           u."id" AS "userId", u."email" AS "userEmail", u."name" AS "userName", u."phone" AS "userPhone",
+           m."role"::text AS "role",
+           o."id" AS "orgId", o."name" AS "orgName", o."slug" AS "orgSlug", o."trade"::text AS "orgTrade",
+           o."timezone" AS "orgTimezone", o."plan"::text AS "orgPlan",
+           o."subscriptionStatus"::text AS "orgSubscriptionStatus", o."trialEndsAt" AS "orgTrialEndsAt",
+           o."onboardingDismissed" AS "orgOnboardingDismissed",
+           o."officeCanValidatePhotos" AS "orgOfficeCanValidatePhotos"
+    FROM "Session" s
+    JOIN "User" u ON u."id" = s."userId"
+    JOIN "Membership" m ON m."userId" = s."userId" AND m."organizationId" = s."organizationId"
+    JOIN "Organization" o ON o."id" = s."organizationId"
+    WHERE s."id" = ${id}
+    LIMIT 1`;
+  const row = rows[0];
+  if (!row) return null;
+  const now = Date.now();
+  if (row.expiresAt.getTime() <= now) {
+    await db.session.delete({ where: { id } }).catch(() => {});
+    return null;
+  }
+  if (row.expiresAt.getTime() - now < RENEW_THRESHOLD_MS) {
+    row.expiresAt = new Date(now + SESSION_TTL_MS);
+    // Not awaited: renewal must not slow down the page.
+    void db.session.update({ where: { id }, data: { expiresAt: row.expiresAt } }).catch(() => {});
+  }
+  return row;
+}

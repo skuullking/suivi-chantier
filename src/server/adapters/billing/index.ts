@@ -63,7 +63,7 @@ function mapStatus(status: string): "TRIALING" | "ACTIVE" | "PAST_DUE" | "CANCEL
   return "CANCELED";
 }
 
-class StripeBillingProvider implements BillingProvider {
+export class StripeBillingProvider implements BillingProvider {
   readonly name = "stripe" as const;
   private readonly stripe: Stripe;
   constructor(secretKey: string) {

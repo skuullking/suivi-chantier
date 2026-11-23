@@ -191,3 +191,21 @@ Format : date — décision — raison.
 - **Mobile patron** : barre d'onglets en bas (Accueil, Chantiers, Ajouter, À traiter, Planning) sous `lg`,
   le menu complet reste dans le tiroir.
 - Maquettes de référence : canevas « ChantierLink — Redesign » (Artifact privé).
+
+## 2026-11-23 — Services réels gratuits pour les démos
+
+- **IA compatible OpenAI** (`LLM_PROVIDER=openai`) en plus de Claude : Groq (offre gratuite), OpenAI, Mistral ou
+  Ollama local. Les consignes, schémas et repli sur l'heuristique sont partagés (`StructuredLlmProvider`) ; seul
+  l'appel change (sorties structurées natives pour Claude, mode JSON + schéma dans les consignes pour les autres).
+  Attention RGPD : Groq traite les données hors UE ; Ollama garde tout sur le serveur.
+- **OCR réel par défaut en local** (`OCR_PROVIDER=tesseract`) : le modèle français est mis en cache dans le dossier
+  temporaire du système (jamais à la racine du projet).
+- **Notifications push** : bouton d'activation aussi côté patron / bureau (page Notifications), plus seulement dans
+  l'espace ouvrier.
+
+## 2026-11-23 — Performance
+
+- **Prisma `relationJoins`** (préversion) : chaque `include` devient une seule requête SQL (jointures) au lieu d'une
+  requête par relation. Gain surtout en production, quand la base est distante. Pour revenir en arrière : retirer
+  `previewFeatures` du schéma puis `pnpm db:generate`.
+- **Session** résolue en une requête SQL brute (`resolveSession`), **cache client** `staleTimes.dynamic = 30 s`.

@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Crop, Droplets, Pencil, RotateCcw, Undo2, X } from "lucide-react";
-import { useCallback, useRef, useState, useTransition } from "react";
+import { useCallback, useOptimistic, useRef, useState, useTransition } from "react";
 import { notify } from "@/components/app/notify";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -34,11 +34,23 @@ const STATUS_LABEL = { PENDING: "À valider", APPROVED: "Validée", REJECTED: "R
  * Photo grid with batch validation. Keyboard: arrows to move, Space to select, A = approve, R = reject,
  * Enter = open. The selection (or the focused photo) is the target of A / R.
  */
-export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canValidate: boolean }) {
+export function PhotoGrid({
+  photos: serverPhotos,
+  canValidate,
+}: {
+  photos: GridPhoto[];
+  canValidate: boolean;
+}) {
+  // Optimistic status: the badge changes on click, the server confirms (or rolls back) in the background.
+  const [photos, setOptimisticStatus] = useOptimistic(
+    serverPhotos,
+    (current, change: { ids: string[]; status: GridPhoto["status"] }) =>
+      current.map((p) => (change.ids.includes(p.id) ? { ...p, status: change.status } : p)),
+  );
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [focus, setFocus] = useState(0);
   const [open, setOpen] = useState<GridPhoto | null>(null);
-  const [pending, startTransition] = useTransition();
+  const [, startTransition] = useTransition();
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
 
   const toggle = (id: string) =>
@@ -52,12 +64,13 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
   const act = useCallback(
     (ids: string[], status: "APPROVED" | "REJECTED" | "PENDING") => {
       if (!canValidate || ids.length === 0) return;
+      setSelected(new Set());
       startTransition(async () => {
+        setOptimisticStatus({ ids, status });
         notify(await validateMediaAction(ids, status));
-        setSelected(new Set());
       });
     },
-    [canValidate],
+    [canValidate, setOptimisticStatus],
   );
 
   function onKeyDown(e: React.KeyboardEvent, index: number) {
@@ -123,7 +136,7 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
           <div className="ml-auto flex gap-2">
             <Button
               size="sm"
-              disabled={pending || selected.size === 0}
+              disabled={selected.size === 0}
               onClick={() => act([...selected], "APPROVED")}
               className="bg-emerald-600 hover:bg-emerald-700"
             >
@@ -132,7 +145,7 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
             <Button
               size="sm"
               variant="destructive"
-              disabled={pending || selected.size === 0}
+              disabled={selected.size === 0}
               onClick={() => act([...selected], "REJECTED")}
             >
               <X aria-hidden /> Refuser
@@ -170,6 +183,7 @@ export function PhotoGrid({ photos, canValidate }: { photos: GridPhoto[]; canVal
                 src={p.thumbnail ?? p.display}
                 alt={p.caption ?? ""}
                 loading="lazy"
+                decoding="async"
                 className="size-full object-cover"
               />
             </button>

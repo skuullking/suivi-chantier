@@ -26,6 +26,12 @@ const siteSelect = {
 /** The day of the connected member: planned sites (or, without planning, the sites of his team). */
 export async function workerDay(ctx: ServiceContext) {
   const day = today(ctx.organizationTimeZone);
+  // Tomorrow does not depend on today: started right away.
+  const tomorrowPromise = db.assignment.findMany({
+    where: { organizationId: ctx.organizationId, userId: ctx.userId, date: addDays(day, 1) },
+    include: { site: { select: { id: true, title: true, city: true } } },
+    orderBy: { startTime: "asc" },
+  });
   const assignments = await db.assignment.findMany({
     where: { organizationId: ctx.organizationId, userId: ctx.userId, date: day },
     include: { site: { select: siteSelect }, step: { select: { id: true, title: true } } },
@@ -53,11 +59,7 @@ export async function workerDay(ctx: ServiceContext) {
           select: { id: true, title: true, city: true, code: true },
           orderBy: { title: "asc" },
         }),
-    db.assignment.findMany({
-      where: { organizationId: ctx.organizationId, userId: ctx.userId, date: addDays(day, 1) },
-      include: { site: { select: { id: true, title: true, city: true } } },
-      orderBy: { startTime: "asc" },
-    }),
+    tomorrowPromise,
   ]);
   const seen = new Set<string>();
   const sites = assignments
@@ -150,9 +152,10 @@ export async function arriveOnSite(ctx: ServiceContext, siteId: string) {
 
 /** Detail of a site for the worker (only if assigned). */
 export async function workerSite(ctx: ServiceContext, siteId: string) {
-  await loadSiteFor(ctx, siteId, "site.view");
-  const site = await db.site.findUniqueOrThrow({ where: { id: siteId }, select: siteSelect });
-  const [plans, myMedia, tasks] = await Promise.all([
+  // Access check and data in parallel: if the check fails, Promise.all rejects and nothing is returned.
+  const [, site, plans, myMedia, tasks] = await Promise.all([
+    loadSiteFor(ctx, siteId, "site.view"),
+    db.site.findUniqueOrThrow({ where: { id: siteId }, select: siteSelect }),
     db.document.findMany({
       where: { organizationId: ctx.organizationId, siteId, type: "PLAN" },
       orderBy: { createdAt: "desc" },

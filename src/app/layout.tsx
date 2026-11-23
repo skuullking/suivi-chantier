@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Geist, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
+import { Suspense } from "react";
+import { NavigationProgress } from "@/components/app/navigation-feedback";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import "./globals.css";
@@ -36,6 +38,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="fr" className={`h-full antialiased ${display.variable} ${ui.variable} ${code.variable}`}>
       <body className="flex min-h-full flex-col" data-nonce-ready={nonce ? "1" : "0"}>
+        <Suspense fallback={null}>
+          <NavigationProgress />
+        </Suspense>
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster richColors position="top-center" />
       </body>

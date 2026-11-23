@@ -2,7 +2,7 @@
 
 import { Check, FileText, Mic, Pencil, RefreshCw, Send, X } from "lucide-react";
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import { notify } from "@/components/app/notify";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -53,12 +53,20 @@ export function InboxItemCard({
   const [clientId, setClientId] = useState(item.proposedClientId ?? "");
   const [docType, setDocType] = useState(item.proposedDocumentType ?? "OTHER");
   const [pending, startTransition] = useTransition();
+  // The card leaves the list on click; it comes back by itself if the server refuses.
+  const [handled, setHandled] = useOptimistic(false);
+  const handle = (run: () => Promise<Parameters<typeof notify>[0]>) =>
+    startTransition(async () => {
+      setHandled(true);
+      notify(await run());
+    });
   const site = sites.find((s) => s.id === siteId);
   const confidence = item.confidence !== null ? Math.round(item.confidence * 100) : null;
   const canAccept =
     Boolean(item.proposedSiteId) ||
     (item.kind === "DOCUMENT" && Boolean(item.proposedClientId || item.proposedDocumentType));
 
+  if (handled) return null;
   return (
     <article className="grid gap-3 rounded-xl border bg-white p-4" data-testid="inbox-item">
       <div className="flex gap-3">
@@ -198,15 +206,13 @@ export function InboxItemCard({
             className="sm:col-span-2"
             disabled={pending || (item.kind !== "DOCUMENT" && !siteId)}
             onClick={() =>
-              startTransition(async () =>
-                notify(
-                  await resolveInboxAction(item.id, {
-                    siteId: siteId || null,
-                    stepId: stepId || null,
-                    clientId: clientId || null,
-                    documentType: item.kind === "DOCUMENT" ? docType : null,
-                  }),
-                ),
+              handle(() =>
+                resolveInboxAction(item.id, {
+                  siteId: siteId || null,
+                  stepId: stepId || null,
+                  clientId: clientId || null,
+                  documentType: item.kind === "DOCUMENT" ? docType : null,
+                }),
               )
             }
           >
@@ -217,7 +223,7 @@ export function InboxItemCard({
         <div className="flex flex-wrap gap-2">
           <Button
             disabled={pending || !canAccept}
-            onClick={() => startTransition(async () => notify(await resolveInboxAction(item.id)))}
+            onClick={() => handle(() => resolveInboxAction(item.id))}
             className="bg-emerald-600 hover:bg-emerald-700"
           >
             <Check aria-hidden /> OK
@@ -229,7 +235,7 @@ export function InboxItemCard({
             variant="ghost"
             className="ml-auto"
             disabled={pending}
-            onClick={() => startTransition(async () => notify(await dismissInboxAction(item.id)))}
+            onClick={() => handle(() => dismissInboxAction(item.id))}
           >
             <X aria-hidden /> Ignorer
           </Button>

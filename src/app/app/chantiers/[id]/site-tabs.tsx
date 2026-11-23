@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePendingHref } from "@/components/app/navigation-feedback";
 import { cn } from "@/lib/utils";
 
 export const SITE_TABS = [
@@ -15,7 +15,7 @@ export const SITE_TABS = [
 ] as const;
 
 export function SiteTabs({ siteId, hidden = [] }: { siteId: string; hidden?: string[] }) {
-  const pathname = usePathname();
+  const { current: pathname, onNavigate } = usePendingHref();
   const base = `/app/chantiers/${siteId}`;
   return (
     <nav aria-label="Sections du chantier" className="-mx-4 overflow-x-auto px-4 pb-1 sm:mx-0 sm:px-0">
@@ -27,6 +27,7 @@ export function SiteTabs({ siteId, hidden = [] }: { siteId: string; hidden?: str
             <li key={tab.slug || "resume"}>
               <Link
                 href={href}
+                onClick={() => onNavigate(href)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "inline-flex h-10 items-center rounded-[10px] border px-3.5 text-sm transition-colors",

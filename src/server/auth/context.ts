@@ -2,10 +2,9 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 import type { Role } from "@/generated/prisma/enums";
-import { db } from "@/server/db";
 import type { MemberActor } from "@/server/permissions/can";
 import { clientIpFromHeaders } from "@/server/security/request";
-import { SESSION_COOKIE, validateSessionToken } from "./session";
+import { resolveSession, SESSION_COOKIE } from "./session";
 
 /** Context passed to every service: who acts, in which organization. */
 export type ServiceContext = {
@@ -36,50 +35,37 @@ export type AuthContext = ServiceContext & {
 
 /** Resolves the current session (memoized per request). Returns null when not signed in. */
 export const getAuthContext = cache(async (): Promise<AuthContext | null> => {
-  const cookieStore = await cookies();
+  const [cookieStore, h] = await Promise.all([cookies(), headers()]);
   const token = cookieStore.get(SESSION_COOKIE)?.value;
   if (!token) return null;
-  const session = await validateSessionToken(token);
-  if (!session) return null;
-
-  const membership = await db.membership.findUnique({
-    where: { userId_organizationId: { userId: session.userId, organizationId: session.organizationId } },
-    include: { organization: true },
-  });
-  if (!membership) return null;
-
-  const h = await headers();
-  const org = membership.organization;
+  const s = await resolveSession(token);
+  if (!s) return null;
+  const role = s.role as Role;
   return {
-    sessionId: session.id,
-    userId: session.userId,
-    organizationId: org.id,
-    role: membership.role,
+    sessionId: s.sessionId,
+    userId: s.userId,
+    organizationId: s.orgId,
+    role,
     ip: clientIpFromHeaders(h),
-    organizationTimeZone: org.timezone,
+    organizationTimeZone: s.orgTimezone,
     actor: {
       kind: "member",
-      userId: session.userId,
-      organizationId: org.id,
-      role: membership.role,
-      officeCanValidatePhotos: org.officeCanValidatePhotos,
+      userId: s.userId,
+      organizationId: s.orgId,
+      role,
+      officeCanValidatePhotos: s.orgOfficeCanValidatePhotos,
     },
-    user: {
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
-      phone: session.user.phone,
-    },
+    user: { id: s.userId, email: s.userEmail, name: s.userName, phone: s.userPhone },
     organization: {
-      id: org.id,
-      name: org.name,
-      slug: org.slug,
-      trade: org.trade,
-      timezone: org.timezone,
-      plan: org.plan,
-      subscriptionStatus: org.subscriptionStatus,
-      trialEndsAt: org.trialEndsAt,
-      onboardingDismissed: org.onboardingDismissed,
+      id: s.orgId,
+      name: s.orgName,
+      slug: s.orgSlug,
+      trade: s.orgTrade,
+      timezone: s.orgTimezone,
+      plan: s.orgPlan,
+      subscriptionStatus: s.orgSubscriptionStatus,
+      trialEndsAt: s.orgTrialEndsAt,
+      onboardingDismissed: s.orgOnboardingDismissed,
     },
   };
 });

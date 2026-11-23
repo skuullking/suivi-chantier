@@ -10,7 +10,7 @@ import { computeProgress, siteLateness } from "@/server/domain/progress";
 import { AppError, NotFoundError, ValidationError } from "@/server/errors";
 import { assertCan } from "@/server/permissions/can";
 import { storage } from "@/server/adapters/storage";
-import { assertMembers, loadClientFor, loadSiteFor } from "./access";
+import { assertMembers, assertSiteAccess, loadClientFor, loadSiteFor } from "./access";
 import { audit } from "./audit";
 import { assertSubscriptionUsable } from "./billing";
 import { createClient } from "./clients";
@@ -98,15 +98,17 @@ export async function listSites(ctx: ServiceContext, filters: SiteFilters = {}) 
 
 /** Everything the site detail header + summary tab need. */
 export async function getSite(ctx: ServiceContext, siteId: string) {
-  await loadSiteFor(ctx, siteId, "site.view");
-  const site = await db.site.findUniqueOrThrow({
-    where: { id: siteId },
+  // One query: access check and data together.
+  const site = await db.site.findFirst({
+    where: { id: siteId, organizationId: ctx.organizationId },
     include: {
       client: true,
       steps: { orderBy: { order: "asc" } },
       members: { include: { user: { select: { id: true, name: true, phone: true } } } },
     },
   });
+  if (!site) throw new NotFoundError("Chantier introuvable.");
+  assertSiteAccess(ctx, site, "site.view");
   const day = today(ctx.organizationTimeZone ?? "Europe/Paris");
   return { ...site, lateness: siteLateness(site, site.steps, day) };
 }
@@ -324,10 +326,7 @@ export async function ensureSiteMember(organizationId: string, siteId: string, u
 export async function deleteSite(ctx: ServiceContext, siteId: string) {
   const { site } = await loadSiteFor(ctx, siteId, "site.delete");
   const [media, documents] = await Promise.all([
-    db.media.findMany({
-      where: { siteId },
-      select: { storageKey: true, thumbnailKey: true, editedKey: true },
-    }),
+    db.media.findMany({ where: { siteId }, select: { storageKey: true } }),
     db.document.findMany({ where: { siteId }, select: { id: true, storageKey: true } }),
   ]);
   await db.$transaction(async (tx) => {
@@ -347,15 +346,18 @@ export async function deleteSite(ctx: ServiceContext, siteId: string) {
       tx,
     );
   });
-  const keys = [
-    ...media.flatMap((m) => [m.storageKey, m.thumbnailKey, m.editedKey]),
-    ...documents.map((d) => d.storageKey),
-  ].filter((k): k is string => Boolean(k));
-  await Promise.all(
-    keys.map((k) =>
+  // Each media has its own folder (original, display version, thumbnail, edited copy): remove it whole.
+  const mediaFolders = media.map((m) => m.storageKey.slice(0, m.storageKey.lastIndexOf("/") + 1));
+  await Promise.all([
+    ...mediaFolders.map((prefix) =>
       storage()
-        .delete(k)
+        .deletePrefix(prefix)
         .catch(() => {}),
     ),
-  );
+    ...documents.map((d) =>
+      storage()
+        .delete(d.storageKey)
+        .catch(() => {}),
+    ),
+  ]);
 }
