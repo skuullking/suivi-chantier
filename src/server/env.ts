@@ -52,9 +52,13 @@ const envSchema = z.object({
   WHISPER_API_KEY: z.string().optional(),
   WHISPER_MODEL: z.string().default("whisper-1"),
 
-  LLM_PROVIDER: z.enum(["mock", "anthropic"]).default("mock"),
+  LLM_PROVIDER: z.enum(["mock", "anthropic", "openai"]).default("mock"),
   ANTHROPIC_API_KEY: z.string().optional(),
   ANTHROPIC_MODEL: z.string().default("claude-opus-5-5"),
+  // LLM_PROVIDER=openai: any OpenAI-compatible API (Groq by default, or OpenAI, Mistral, a local Ollama…).
+  LLM_API_URL: z.string().default("https://api.groq.com/openai/v1"),
+  LLM_API_KEY: z.string().optional(),
+  LLM_MODEL: z.string().default("llama-3.3-70b-versatile"),
   AUTO_CLASSIFY_THRESHOLD: z.coerce.number().min(0).max(1).default(0.75),
 
   OCR_PROVIDER: z.enum(["mock", "tesseract"]).default("mock"),

@@ -3,6 +3,9 @@
  * Images / scanned PDFs: `mock` returns the text registered by the simulators (or nothing), `tesseract` runs a
  * local OCR (tesseract.js, French). Scanned PDFs without a text layer are not rasterized (see DECISIONS.md).
  */
+import { mkdir } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { extractText } from "unpdf";
 import { storage } from "@/server/adapters/storage";
 import { sha256Hex } from "@/server/auth/tokens";
@@ -34,7 +37,10 @@ class TesseractOcrProvider implements OcrProvider {
   readonly name = "tesseract";
   async imageText(input: OcrInput) {
     const { createWorker } = await import("tesseract.js");
-    const worker = await createWorker("fra");
+    // The French model (~15 MB) is downloaded once and cached outside the project folder.
+    const cachePath = path.join(os.tmpdir(), "chantierlink-tesseract");
+    await mkdir(cachePath, { recursive: true });
+    const worker = await createWorker("fra", 1, { cachePath });
     try {
       const { data } = await worker.recognize(Buffer.from(input.bytes));
       return data.text;

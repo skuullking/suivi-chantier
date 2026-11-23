@@ -40,16 +40,38 @@ WHISPER_API_KEY=sk-...                                            # vide pour un
 WHISPER_MODEL=whisper-1
 ```
 
-## Intelligence artificielle (Claude, API Anthropic)
+Gratuit (avec quotas) via Groq, même clé que pour l'IA ci-dessous :
+
+```dotenv
+TRANSCRIPTION_PROVIDER=whisper
+WHISPER_API_URL=https://api.groq.com/openai/v1/audio/transcriptions
+WHISPER_API_KEY=gsk_...                                           # https://console.groq.com/keys
+WHISPER_MODEL=whisper-large-v3-turbo
+```
+
+## Intelligence artificielle
 
 Utilisée pour rattacher un message WhatsApp ambigu au bon chantier, classer les documents et rédiger le résumé du
-jour. Sorties structurées validées ; en cas d'erreur ou de refus, l'heuristique locale prend le relais.
+jour. Sorties structurées validées ; en cas d'erreur, de refus ou de quota atteint, l'heuristique locale prend le
+relais.
+
+**Claude (API Anthropic, payant)** — sorties structurées natives :
 
 ```dotenv
 LLM_PROVIDER=anthropic
 ANTHROPIC_API_KEY=sk-ant-...            # https://console.anthropic.com
 ANTHROPIC_MODEL=claude-opus-5-5          # modèle par défaut
 AUTO_CLASSIFY_THRESHOLD=0.75            # en dessous : « À traiter »
+```
+
+**API compatible OpenAI** — Groq (offre gratuite avec quotas, serveurs hors UE), OpenAI, Mistral, ou Ollama en
+local (gratuit, sans clé, aucune donnée ne sort du serveur). Mode JSON + validation Zod :
+
+```dotenv
+LLM_PROVIDER=openai
+LLM_API_URL=https://api.groq.com/openai/v1   # Ollama : http://localhost:11434/v1
+LLM_API_KEY=gsk_...                          # vide pour Ollama
+LLM_MODEL=llama-3.3-70b-versatile            # liste : GET <LLM_API_URL>/models
 ```
 
 ## OCR (factures photographiées, scans)
