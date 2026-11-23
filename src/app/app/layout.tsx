@@ -1,23 +1,56 @@
+import { Bell } from "lucide-react";
+import { Suspense } from "react";
 import { AppSidebar, ManagerTabBar, MobileNav } from "@/components/app/app-nav";
 import { CommandPalette } from "@/components/app/command-palette";
 import { NotificationBell } from "@/components/app/notification-bell";
 import { UserMenu } from "@/components/app/user-menu";
+import { Button } from "@/components/ui/button";
 import { formatRelative } from "@/lib/format";
 import { ROLE_LABELS } from "@/lib/labels";
-import { requireManager } from "@/server/auth/context";
+import { requireManager, type AuthContext } from "@/server/auth/context";
 import { openInboxCount, pendingPhotoCount } from "@/server/services/counters";
 import { listNotifications, unreadNotificationCount } from "@/server/services/notifications";
 
-export default async function BackOfficeLayout({ children }: { children: React.ReactNode }) {
-  const ctx = await requireManager();
-  const [inboxCount, pendingPhotos, notifications, unread] = await Promise.all([
-    openInboxCount(ctx.organizationId),
-    pendingPhotoCount(ctx.organizationId),
+/** Notifications streamed after the page: the shell never waits for them. */
+async function BellSlot({ ctx }: { ctx: AuthContext }) {
+  const [notifications, unread] = await Promise.all([
     listNotifications(ctx, 8),
     unreadNotificationCount(ctx),
   ]);
+  return (
+    <NotificationBell
+      unread={unread}
+      items={notifications.map((n) => ({
+        id: n.id,
+        title: n.title,
+        body: n.body,
+        link: n.link,
+        createdAt: formatRelative(n.createdAt),
+        read: Boolean(n.readAt),
+      }))}
+    />
+  );
+}
+
+function BellFallback() {
+  return (
+    <Button variant="outline" size="icon" aria-label="Notifications" disabled>
+      <Bell className="size-5" aria-hidden />
+    </Button>
+  );
+}
+
+export default async function BackOfficeLayout({ children }: { children: React.ReactNode }) {
+  const ctx = await requireManager();
+  // Not awaited: the counter is streamed into the menu badges (see AsyncCount in app-nav).
+  const toSort = Promise.all([
+    openInboxCount(ctx.organizationId),
+    pendingPhotoCount(ctx.organizationId),
+  ]).then(
+    ([inbox, photos]) => inbox + photos,
+    () => 0, // A failing counter must never break the menu.
+  );
   const isOwner = ctx.role === "OWNER";
-  const toSort = inboxCount + pendingPhotos;
 
   return (
     <div className="bg-background flex min-h-screen">
@@ -28,17 +61,9 @@ export default async function BackOfficeLayout({ children }: { children: React.R
           <div className="flex flex-1 items-center">
             <CommandPalette />
           </div>
-          <NotificationBell
-            unread={unread}
-            items={notifications.map((n) => ({
-              id: n.id,
-              title: n.title,
-              body: n.body,
-              link: n.link,
-              createdAt: formatRelative(n.createdAt),
-              read: Boolean(n.readAt),
-            }))}
-          />
+          <Suspense fallback={<BellFallback />}>
+            <BellSlot ctx={ctx} />
+          </Suspense>
           <UserMenu name={ctx.user.name} email={ctx.user.email} roleLabel={ROLE_LABELS[ctx.role]} />
         </header>
         <main id="contenu" className="w-full max-w-[1240px] flex-1 px-4 pt-7 pb-28 sm:px-8 lg:pb-12">

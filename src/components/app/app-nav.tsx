@@ -14,7 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { Suspense, use, useState, type ReactNode } from "react";
 import { LogoMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -47,13 +47,28 @@ function countLabel(n: number) {
   return n > 99 ? "99+" : String(n);
 }
 
+/** Inbox counter streamed from the server: the menu shows right away, the badge appears when ready. */
+type Count = Promise<number>;
+
+function CountValue({ value, children }: { value: Count; children: (n: number) => ReactNode }) {
+  return children(use(value));
+}
+
+function AsyncCount({ value, children }: { value: Count; children: (n: number) => ReactNode }) {
+  return (
+    <Suspense fallback={null}>
+      <CountValue value={value}>{children}</CountValue>
+    </Suspense>
+  );
+}
+
 function NavLinks({
   isOwner,
   inboxCount,
   onNavigate,
 }: {
   isOwner: boolean;
-  inboxCount: number;
+  inboxCount: Count;
   onNavigate?: () => void;
 }) {
   const pathname = usePathname();
@@ -76,15 +91,21 @@ function NavLinks({
           >
             <item.icon className="size-[18px]" aria-hidden />
             <span className="flex-1">{item.label}</span>
-            {item.badgeKey === "inbox" && inboxCount > 0 ? (
-              <span
-                className={cn(
-                  "text-ink-900 flex h-[22px] min-w-[22px] items-center justify-center rounded-md px-1.5 font-mono text-xs font-bold",
-                  active ? "bg-white" : "bg-signal-400",
-                )}
-              >
-                {countLabel(inboxCount)}
-              </span>
+            {item.badgeKey === "inbox" ? (
+              <AsyncCount value={inboxCount}>
+                {(n) =>
+                  n > 0 ? (
+                    <span
+                      className={cn(
+                        "text-ink-900 flex h-[22px] min-w-[22px] items-center justify-center rounded-md px-1.5 font-mono text-xs font-bold",
+                        active ? "bg-white" : "bg-signal-400",
+                      )}
+                    >
+                      {countLabel(n)}
+                    </span>
+                  ) : null
+                }
+              </AsyncCount>
             ) : null}
           </Link>
         );
@@ -114,7 +135,7 @@ export function AppSidebar({
 }: {
   organizationName: string;
   isOwner: boolean;
-  inboxCount: number;
+  inboxCount: Count;
 }) {
   return (
     <aside className="bg-sidebar sticky top-0 hidden h-screen w-[248px] shrink-0 flex-col gap-7 px-3.5 py-5 lg:flex">
@@ -131,7 +152,7 @@ export function MobileNav({
 }: {
   organizationName: string;
   isOwner: boolean;
-  inboxCount: number;
+  inboxCount: Count;
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -162,7 +183,7 @@ const TABS = [
 ];
 
 /** Bottom tab bar for owners / office staff on a phone (hidden from lg up). */
-export function ManagerTabBar({ inboxCount }: { inboxCount: number }) {
+export function ManagerTabBar({ inboxCount }: { inboxCount: Count }) {
   const pathname = usePathname();
   const activeHref =
     TABS.filter((t) => isActive(pathname, t.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href ??
@@ -179,7 +200,6 @@ export function ManagerTabBar({ inboxCount }: { inboxCount: number }) {
             key={t.href}
             href={t.href}
             aria-current={active ? "page" : undefined}
-            aria-label={t.badge && inboxCount > 0 ? `${t.label}, ${inboxCount} en attente` : undefined}
             className={cn(
               "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold",
               active ? "bg-signal-400 text-ink-900" : "text-sidebar-foreground",
@@ -188,10 +208,24 @@ export function ManagerTabBar({ inboxCount }: { inboxCount: number }) {
           >
             <t.icon className="size-[22px]" aria-hidden />
             {t.label}
-            {t.badge && inboxCount > 0 && !active ? (
-              <span className="bg-signal-400 text-ink-900 absolute top-1 right-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-[5px] px-1 font-mono text-[10px] font-bold">
-                {countLabel(inboxCount)}
-              </span>
+            {t.badge ? (
+              <AsyncCount value={inboxCount}>
+                {(n) =>
+                  n > 0 ? (
+                    <>
+                      <span className="sr-only">, {n} en attente</span>
+                      {!active ? (
+                        <span
+                          aria-hidden
+                          className="bg-signal-400 text-ink-900 absolute top-1 right-2 flex h-[18px] min-w-[18px] items-center justify-center rounded-[5px] px-1 font-mono text-[10px] font-bold"
+                        >
+                          {countLabel(n)}
+                        </span>
+                      ) : null}
+                    </>
+                  ) : null
+                }
+              </AsyncCount>
             ) : null}
           </Link>
         );

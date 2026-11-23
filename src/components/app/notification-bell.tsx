@@ -2,7 +2,7 @@
 
 import { Bell } from "lucide-react";
 import Link from "next/link";
-import { useTransition } from "react";
+import { useOptimistic, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,8 +23,27 @@ export type BellNotification = {
   read: boolean;
 };
 
-export function NotificationBell({ items, unread }: { items: BellNotification[]; unread: number }) {
+export function NotificationBell({
+  items: serverItems,
+  unread: serverUnread,
+}: {
+  items: BellNotification[];
+  unread: number;
+}) {
   const [pending, startTransition] = useTransition();
+  // Read state updated on click (badge and bold titles), confirmed by the server in the background.
+  const [state, markRead] = useOptimistic(
+    { items: serverItems, unread: serverUnread },
+    (current, ids: string[] | "all") => {
+      const hit = (n: BellNotification) => !n.read && (ids === "all" || ids.includes(n.id));
+      const count = ids === "all" ? current.unread : current.items.filter(hit).length;
+      return {
+        items: current.items.map((n) => (hit(n) ? { ...n, read: true } : n)),
+        unread: Math.max(0, current.unread - count),
+      };
+    },
+  );
+  const { items, unread } = state;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -50,7 +69,12 @@ export function NotificationBell({ items, unread }: { items: BellNotification[];
               type="button"
               disabled={pending}
               className="text-ink-900 text-xs font-normal underline"
-              onClick={() => startTransition(async () => void (await markNotificationsReadAction()))}
+              onClick={() =>
+                startTransition(async () => {
+                  markRead("all");
+                  await markNotificationsReadAction();
+                })
+              }
             >
               Tout marquer comme lu
             </button>
@@ -66,7 +90,11 @@ export function NotificationBell({ items, unread }: { items: BellNotification[];
                 href={n.link ?? "/app/notifications"}
                 className="flex flex-col items-start gap-0.5"
                 onClick={() => {
-                  if (!n.read) startTransition(async () => void (await markNotificationsReadAction([n.id])));
+                  if (!n.read)
+                    startTransition(async () => {
+                      markRead([n.id]);
+                      await markNotificationsReadAction([n.id]);
+                    });
                 }}
               >
                 <span className={n.read ? "text-ink-600" : "font-semibold"}>{n.title}</span>
