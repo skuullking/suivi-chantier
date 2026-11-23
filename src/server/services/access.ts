@@ -19,13 +19,21 @@ export async function loadSiteFor(ctx: ServiceContext, siteId: string, action: A
     include: { members: { select: { userId: true } } },
   });
   if (!site) throw new NotFoundError("Chantier introuvable.");
+  const assignedUserIds = assertSiteAccess(ctx, site, action);
+  return { site, assignedUserIds };
+}
+
+/** Permission check on an already loaded site (avoids a second query). Returns the assigned user ids. */
+export function assertSiteAccess<
+  S extends { id: string; organizationId: string; members: { userId: string }[] },
+>(ctx: ServiceContext, site: S, action: Action): string[] {
   const assignedUserIds = site.members.map((m) => m.userId);
   if (!can(ctx.actor, action, { organizationId: site.organizationId, siteId: site.id, assignedUserIds })) {
     // Workers trying to open a site they are not assigned to get the same answer as for a missing site.
     if (ctx.actor.role === "WORKER") throw new NotFoundError("Chantier introuvable.");
     throw new ForbiddenError();
   }
-  return { site, assignedUserIds };
+  return assignedUserIds;
 }
 
 export async function loadClientFor(ctx: ServiceContext, clientId: string, action: Action, tx: Tx = db) {

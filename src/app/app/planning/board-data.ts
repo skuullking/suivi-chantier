@@ -60,23 +60,8 @@ export async function buildBoard(ctx: ServiceContext, sp: PlanningParams, siteId
     next = addMonths(month, 1);
   }
 
-  const assignments = await listAssignments(ctx, { from, to, siteId });
-  const boardAssignments: BoardAssignment[] = assignments.map((a) => ({
-    id: a.id,
-    date: toDateKey(a.date),
-    userId: a.userId,
-    userName: a.user.name,
-    siteId: a.siteId,
-    siteTitle: a.site.title,
-    siteCode: a.site.code,
-    slot: a.slot,
-    startTime: a.startTime,
-    stepId: a.stepId,
-    instructions: a.instructions,
-    conflict: a.conflictIds.length > 0,
-  }));
-
-  const [members, sites, steps] = await Promise.all([
+  const [assignments, members, sites, steps] = await Promise.all([
+    listAssignments(ctx, { from, to, siteId }),
     db.membership.findMany({
       where: { organizationId: ctx.organizationId },
       include: { user: { select: { id: true, name: true } } },
@@ -96,6 +81,20 @@ export async function buildBoard(ctx: ServiceContext, sp: PlanningParams, siteId
       orderBy: { order: "asc" },
     }),
   ]);
+  const boardAssignments: BoardAssignment[] = assignments.map((a) => ({
+    id: a.id,
+    date: toDateKey(a.date),
+    userId: a.userId,
+    userName: a.user.name,
+    siteId: a.siteId,
+    siteTitle: a.site.title,
+    siteCode: a.site.code,
+    slot: a.slot,
+    startTime: a.startTime,
+    stepId: a.stepId,
+    instructions: a.instructions,
+    conflict: a.conflictIds.length > 0,
+  }));
   const stepsBySite: Record<string, { value: string; label: string }[]> = {};
   for (const s of steps) (stepsBySite[s.siteId] ??= []).push({ value: s.id, label: s.title });
 

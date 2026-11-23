@@ -29,24 +29,26 @@ export async function listAssignments(ctx: ServiceContext, range: PlanningRange)
   } else {
     assertCan(ctx.actor, "planning.view", { organizationId: ctx.organizationId });
   }
-  const assignments = await db.assignment.findMany({
-    where: {
-      organizationId: ctx.organizationId,
-      date: { gte: range.from, lte: range.to },
-      ...(ownOnly ? { userId: ctx.userId } : range.userId ? { userId: range.userId } : {}),
-      ...(range.siteId ? { siteId: range.siteId } : {}),
-    },
-    include: assignmentInclude,
-    orderBy: [{ date: "asc" }, { startTime: "asc" }],
-  });
-  // Conflicts are computed on the whole organization planning (not only the filtered view).
-  const all = range.siteId
-    ? await db.assignment.findMany({
-        where: { organizationId: ctx.organizationId, date: { gte: range.from, lte: range.to } },
-        select: { id: true, userId: true, date: true, slot: true, siteId: true },
-      })
-    : assignments;
-  const conflicts = findConflicts(all);
+  // Conflicts are computed on the whole organization planning (not only the filtered view): both queries in parallel.
+  const [assignments, orgWide] = await Promise.all([
+    db.assignment.findMany({
+      where: {
+        organizationId: ctx.organizationId,
+        date: { gte: range.from, lte: range.to },
+        ...(ownOnly ? { userId: ctx.userId } : range.userId ? { userId: range.userId } : {}),
+        ...(range.siteId ? { siteId: range.siteId } : {}),
+      },
+      include: assignmentInclude,
+      orderBy: [{ date: "asc" }, { startTime: "asc" }],
+    }),
+    range.siteId
+      ? db.assignment.findMany({
+          where: { organizationId: ctx.organizationId, date: { gte: range.from, lte: range.to } },
+          select: { id: true, userId: true, date: true, slot: true, siteId: true },
+        })
+      : null,
+  ]);
+  const conflicts = findConflicts(orgWide ?? assignments);
   return assignments.map((a) => ({ ...a, conflictIds: conflicts.get(a.id) ?? [] }));
 }
 

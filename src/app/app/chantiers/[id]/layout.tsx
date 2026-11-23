@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { LateBadge, ProgressBar, SiteStatusBadge, StepRibbon } from "@/components/app/status";
 import { requireManager } from "@/server/auth/context";
-import { getSite } from "@/server/services/sites";
 import { loadSite } from "./site-data";
 import { SiteStatusMenu } from "./site-status-menu";
 import { SiteTabs } from "./site-tabs";
@@ -9,7 +8,8 @@ import { SiteTabs } from "./site-tabs";
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const ctx = await requireManager();
   const { id } = await params;
-  const site = await getSite(ctx, id).catch(() => null);
+  // loadSite is memoized per request: shared with the layout and the page (no extra query).
+  const site = await loadSite(ctx, id).catch(() => null);
   return { title: site ? site.title : "Chantier" };
 }
 

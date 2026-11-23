@@ -25,6 +25,9 @@ const nextConfig: NextConfig = {
     "embedded-postgres",
   ],
   experimental: {
+    // Client router cache: going back to a page visited less than 30 s ago is instant (no server round trip).
+    // Server actions that call revalidatePath/refresh still invalidate it right away.
+    staleTimes: { dynamic: 30, static: 300 },
     serverActions: {
       bodySizeLimit: "30mb",
     },

@@ -14,10 +14,12 @@ export default async function SitePlanningPage({
   searchParams: Promise<{ date?: string }>;
 }) {
   const ctx = await requireManager();
-  const { id } = await params;
-  await loadSite(ctx, id);
-  const sp = await searchParams;
-  const board = await buildBoard(ctx, { vue: "semaine", date: sp.date }, id);
+  const [{ id }, sp] = await Promise.all([params, searchParams]);
+  // loadSite (404 / access) and the board run in parallel; the board is scoped to the organization anyway.
+  const [, board] = await Promise.all([
+    loadSite(ctx, id),
+    buildBoard(ctx, { vue: "semaine", date: sp.date }, id),
+  ]);
   const href = (date: string) => `/app/chantiers/${id}/planning?date=${date}`;
   return (
     <div className="grid gap-3">

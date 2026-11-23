@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { validateSessionToken, createSession } from "@/server/auth/session";
+import { createSession, resolveSession, validateSessionToken } from "@/server/auth/session";
 import { hashToken } from "@/server/auth/tokens";
 import { db } from "@/server/db";
 import { AppError, ForbiddenError } from "@/server/errors";
@@ -80,6 +80,48 @@ describe("authentication & sessions", () => {
       data: { expiresAt: new Date(Date.now() - 1000) },
     });
     expect(await validateSessionToken(token)).toBeNull();
+  });
+
+  it("resolves session, user, role and organization in one query", async () => {
+    const { owner, organization } = await createOrganization();
+    const { token } = await createSession(owner.id, organization.id);
+    const resolved = await resolveSession(token);
+    expect(resolved).toMatchObject({
+      userId: owner.id,
+      userEmail: owner.email,
+      role: "OWNER",
+      orgId: organization.id,
+      orgName: organization.name,
+      orgTimezone: organization.timezone,
+    });
+    expect(typeof resolved?.orgOnboardingDismissed).toBe("boolean");
+    expect(resolved?.expiresAt).toBeInstanceOf(Date);
+    expect(await resolveSession("faux-jeton")).toBeNull();
+
+    // No membership anymore → no session context.
+    await db.membership.deleteMany({ where: { userId: owner.id, organizationId: organization.id } });
+    expect(await resolveSession(token)).toBeNull();
+  });
+
+  it("resolveSession drops expired sessions and renews those close to expiry", async () => {
+    const { owner, organization } = await createOrganization();
+    const { token } = await createSession(owner.id, organization.id);
+    await db.session.updateMany({
+      where: { userId: owner.id },
+      data: { expiresAt: new Date(Date.now() + 60_000) },
+    });
+    const renewed = await resolveSession(token);
+    expect(renewed!.expiresAt.getTime()).toBeGreaterThan(Date.now() + 20 * 24 * 3600 * 1000);
+
+    // Separate session (the renewal above is not awaited and must not race with this update).
+    const other = await createOrganization();
+    const expired = await createSession(other.owner.id, other.organization.id);
+    await db.session.updateMany({
+      where: { userId: other.owner.id },
+      data: { expiresAt: new Date(Date.now() - 1000) },
+    });
+    expect(await resolveSession(expired.token)).toBeNull();
+    expect(await db.session.count({ where: { userId: other.owner.id } })).toBe(0);
   });
 
   it("resets a password with a single-use token and closes sessions", async () => {

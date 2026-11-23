@@ -10,7 +10,7 @@ import { computeProgress, siteLateness } from "@/server/domain/progress";
 import { AppError, NotFoundError, ValidationError } from "@/server/errors";
 import { assertCan } from "@/server/permissions/can";
 import { storage } from "@/server/adapters/storage";
-import { assertMembers, loadClientFor, loadSiteFor } from "./access";
+import { assertMembers, assertSiteAccess, loadClientFor, loadSiteFor } from "./access";
 import { audit } from "./audit";
 import { assertSubscriptionUsable } from "./billing";
 import { createClient } from "./clients";
@@ -98,15 +98,17 @@ export async function listSites(ctx: ServiceContext, filters: SiteFilters = {}) 
 
 /** Everything the site detail header + summary tab need. */
 export async function getSite(ctx: ServiceContext, siteId: string) {
-  await loadSiteFor(ctx, siteId, "site.view");
-  const site = await db.site.findUniqueOrThrow({
-    where: { id: siteId },
+  // One query: access check and data together.
+  const site = await db.site.findFirst({
+    where: { id: siteId, organizationId: ctx.organizationId },
     include: {
       client: true,
       steps: { orderBy: { order: "asc" } },
       members: { include: { user: { select: { id: true, name: true, phone: true } } } },
     },
   });
+  if (!site) throw new NotFoundError("Chantier introuvable.");
+  assertSiteAccess(ctx, site, "site.view");
   const day = today(ctx.organizationTimeZone ?? "Europe/Paris");
   return { ...site, lateness: siteLateness(site, site.steps, day) };
 }

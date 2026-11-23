@@ -5,16 +5,14 @@ import { UserMenu } from "@/components/app/user-menu";
 import { formatRelative } from "@/lib/format";
 import { ROLE_LABELS } from "@/lib/labels";
 import { requireManager } from "@/server/auth/context";
-import { db } from "@/server/db";
+import { openInboxCount, pendingPhotoCount } from "@/server/services/counters";
 import { listNotifications, unreadNotificationCount } from "@/server/services/notifications";
 
 export default async function BackOfficeLayout({ children }: { children: React.ReactNode }) {
   const ctx = await requireManager();
   const [inboxCount, pendingPhotos, notifications, unread] = await Promise.all([
-    db.inboxItem.count({ where: { organizationId: ctx.organizationId, status: "OPEN" } }),
-    db.media.count({
-      where: { organizationId: ctx.organizationId, kind: "PHOTO", validationStatus: "PENDING" },
-    }),
+    openInboxCount(ctx.organizationId),
+    pendingPhotoCount(ctx.organizationId),
     listNotifications(ctx, 8),
     unreadNotificationCount(ctx),
   ]);

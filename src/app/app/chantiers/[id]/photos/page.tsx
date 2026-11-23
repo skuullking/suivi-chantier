@@ -28,8 +28,10 @@ export default async function SitePhotosPage({
   const { id } = await params;
   const sp = await searchParams;
   const status = FILTERS.find((f) => f.key === sp.statut && f.key)?.key || undefined;
-  const site = await loadSite(ctx, id);
-  const media = await listSiteMedia(ctx, id, { status, stepId: sp.etape || undefined });
+  const [site, media] = await Promise.all([
+    loadSite(ctx, id),
+    listSiteMedia(ctx, id, { status, stepId: sp.etape || undefined }),
+  ]);
   const photos = media.filter((m) => m.kind === "PHOTO");
   const voices = media.filter((m) => m.kind !== "PHOTO");
   const canValidate = can(ctx.actor, "media.validate", { organizationId: ctx.organizationId });
