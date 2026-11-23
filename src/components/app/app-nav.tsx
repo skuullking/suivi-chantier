@@ -13,8 +13,8 @@ import {
   UsersRound,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Suspense, use, useState, type ReactNode } from "react";
+import { usePendingHref } from "@/components/app/navigation-feedback";
 import { LogoMark } from "@/components/brand/logo";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -71,16 +71,21 @@ function NavLinks({
   inboxCount: Count;
   onNavigate?: () => void;
 }) {
-  const pathname = usePathname();
+  // Active state follows the click immediately, before the server has answered.
+  const { current, pendingHref, onNavigate: markPending } = usePendingHref();
   return (
     <nav aria-label="Navigation principale" className="grid gap-0.5">
       {ITEMS.filter((i) => isOwner || !i.ownerOnly).map((item) => {
-        const active = isActive(pathname, item.href);
+        const active = isActive(current, item.href);
         return (
           <Link
             key={item.href}
             href={item.href}
-            onClick={onNavigate}
+            onClick={() => {
+              markPending(item.href);
+              onNavigate?.();
+            }}
+            data-pending={pendingHref === item.href ? "1" : undefined}
             aria-current={active ? "page" : undefined}
             className={cn(
               "flex min-h-11 items-center gap-3 rounded-[10px] px-3 text-[15px] transition-colors",
@@ -184,9 +189,9 @@ const TABS = [
 
 /** Bottom tab bar for owners / office staff on a phone (hidden from lg up). */
 export function ManagerTabBar({ inboxCount }: { inboxCount: Count }) {
-  const pathname = usePathname();
+  const { current, onNavigate } = usePendingHref();
   const activeHref =
-    TABS.filter((t) => isActive(pathname, t.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href ??
+    TABS.filter((t) => isActive(current, t.href)).sort((a, b) => b.href.length - a.href.length)[0]?.href ??
     null;
   return (
     <nav
@@ -199,6 +204,7 @@ export function ManagerTabBar({ inboxCount }: { inboxCount: Count }) {
           <Link
             key={t.href}
             href={t.href}
+            onClick={() => onNavigate(t.href)}
             aria-current={active ? "page" : undefined}
             className={cn(
               "relative flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-bold",

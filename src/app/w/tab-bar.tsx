@@ -2,7 +2,7 @@
 
 import { Camera, CircleUserRound, Mic, Sun } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePendingHref } from "@/components/app/navigation-feedback";
 import { cn } from "@/lib/utils";
 import { useQueueCount } from "./offline-sync";
 
@@ -15,7 +15,7 @@ const TABS = [
 
 /** Bottom navigation (thumb reachable, 64 px targets). */
 export function WorkerTabBar() {
-  const pathname = usePathname();
+  const { current: pathname, onNavigate } = usePendingHref();
   const queued = useQueueCount();
   return (
     <nav
@@ -32,6 +32,7 @@ export function WorkerTabBar() {
             <li key={tab.href}>
               <Link
                 href={tab.href}
+                onClick={() => onNavigate(tab.href)}
                 aria-current={active ? "page" : undefined}
                 className={cn(
                   "flex h-14 flex-col items-center justify-center gap-0.5 rounded-xl text-xs font-bold",
