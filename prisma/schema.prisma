@@ -2,8 +2,9 @@
 // Every business table carries `organizationId` (strict multi-tenancy, enforced server-side in services).
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {

@@ -202,3 +202,10 @@ Format : date — décision — raison.
   temporaire du système (jamais à la racine du projet).
 - **Notifications push** : bouton d'activation aussi côté patron / bureau (page Notifications), plus seulement dans
   l'espace ouvrier.
+
+## 2026-11-23 — Performance
+
+- **Prisma `relationJoins`** (préversion) : chaque `include` devient une seule requête SQL (jointures) au lieu d'une
+  requête par relation. Gain surtout en production, quand la base est distante. Pour revenir en arrière : retirer
+  `previewFeatures` du schéma puis `pnpm db:generate`.
+- **Session** résolue en une requête SQL brute (`resolveSession`), **cache client** `staleTimes.dynamic = 30 s`.
